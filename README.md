@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # 📱 WHATSAPP FOR [DOLIBARR ERP CRM](https://www.dolibarr.org)
 
 **Módulo profesional de integración WhatsApp para Dolibarr ERP/CRM**
@@ -435,3 +436,7 @@ All texts and readmes are licensed under GFDL.
 **📱 WhatsApp for Dolibarr** - Desarrollado con ❤️ por Alberto Luque Rivas  
 **🚀 Powered by EasySoft Tech S.L** - API WhatsApp profesional  
 **⭐ Si te gusta el módulo, ¡déjanos una estrella en GitHub!**
+=======
+# dolibarr-whatsapp-module
+Whapi
+>>>>>>> 72c307321219e5c040614139aabb5e8254608d0a
