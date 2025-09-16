@@ -1,0 +1,5 @@
+DONE - 1- Si se escribe desde el telefono y no desde el erp se debe de mostrar dicho mensaje en el ERP, controlar el hook de envio de mensajes.
+DONE - 2- En el historico de cliente mostrar un el circulo de whastapp en el getnomurl para ver si tiene mensajes con un badge
+DONE - 3- Al abrir el chathistory mostrar debajo de la fecha el objeto al que esta relacionado
+4- Tarea programada para envio de mensajes automaticos de whastapp
+5- Visor de weboohlog en utikidades.

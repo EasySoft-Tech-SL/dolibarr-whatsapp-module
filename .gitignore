@@ -1,0 +1,48 @@
+# Archivos temporales
+*.tmp
+*.temp
+*.log
+*.cache
+
+# Archivos de audio temporales
+tmp/
+tmp/*.mp3
+tmp/audio/
+tmp/audio/*.mp3
+
+# Archivos del sistema
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# Archivos de IDEs
+.vscode/
+.idea/
+*.code-workspace
+
+# Archivos de configuración local
+config.local.php
+*.local
+
+# Archivos de compilación
+*.zip.back
+*.bak
+
+# Archivos de log específicos del módulo
+*.error.log
+debug.log
+
+# Archivos de sistema de Windows
+desktop.ini
+
+# Archivos de backup
+*.back
+*.backup
+
+# Archivos de prueba locales
+test_local/
+
+# Mantener el archivo de ejemplo de configuración pero ignorar copias locales
+*_new.lang

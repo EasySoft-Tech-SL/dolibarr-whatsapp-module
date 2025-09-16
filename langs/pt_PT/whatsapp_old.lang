@@ -1,0 +1,316 @@
+# Copyright (C) 2025 Alberto SuperAdmin <aluquerivasdev@gmail#
+# Permissões
+#
+WHATSAPP_RIGHT_READ = Utilizar WhatsApp>
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free #
+# Validação e confirmação
+#
+Whatsa#
+# Mensagens específicas para envio
+#
+WhatsappMessageFromSubject = Mensagem WhatsApp %snfirmLogout = Tem a certeza de que deseja terminar sessão no WhatsApp?ware Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+#
+# Generic
+#
+
+# Module label 'ModuleWhatsappName'
+ModuleWhatsappName = WhatsApp
+# Module description 'ModuleWhatsappDesc'
+ModuleWhatsappDesc = Integração do WhatsApp para o Dolibarr
+
+#
+# Admin page
+#
+WhatsappSetup = Configuração do WhatsApp
+WhapiSettings = Definições do Whapi
+WhatsappSetupPage = Página de configuração do WhatsApp
+WHATSAPP_MYPARAM1 = O meu parâmetro 1
+WHATSAPP_MYPARAM1Tooltip = Descrição do parâmetro 1
+WHATSAPP_MYPARAM2 = O meu parâmetro 2
+WHATSAPP_MYPARAM2Tooltip = Descrição do parâmetro 2
+
+
+#
+# About page
+#
+About = Sobre
+WhatsappAbout = Sobre o WhatsApp
+WhatsappAboutPage = Página de informação sobre o WhatsApp
+
+#
+# Sample page
+#
+WhatsappArea = Início do WhatsApp
+MyPageName = Nome da minha página
+
+#
+# Sample widget
+#
+MyWidget = O meu widget
+MyWidgetDescription = Descrição do meu widget
+
+#
+# Permisos
+#
+WHATSAPP_RIGHT_READ = Usar o WhatsApp
+WHATSAPP_RIGHT_WRITE = Modificar configuração do WhatsApp
+WHATSAPP_RIGHT_DELETE = Eliminar mensagens do WhatsApp
+WHATSAPP_RIGHT_ADMIN = Administrar o WhatsApp
+WHATSAPP_RIGHT_TEMPLATE_DELETE = Eliminar modelos do WhatsApp
+WHATSAPP_RIGHT_TEMPLATE_WRITE = Modificar modelos do WhatsApp
+WHATSAPP_RIGHT_TEMPLATE_READ = Usar modelos do WhatsApp
+WHATSAPP_RIGHT_WEBHOOKLOG_READ=Ver histórico do Webhook
+WHATSAPP_RIGHT_WEBHOOKLOG_WRITE=Modificar histórico do Webhook
+WHATSAPP_RIGHT_WEBHOOKLOG_DELETE=Eliminar histórico do Webhook
+#
+# Configuração
+#
+WHATSAPP_SERVER_URL = <strong>URL do servidor WhatsApp</strong>
+WHATSAPP_SERVER_URLTooltip = URL do servidor (Contacte o administrador do seu servidor para obter esta informação)
+WHATSAPP_SERVER_TOKEN = Token da instância WhatsApp
+WHATSAPP_SERVER_TOKENTooltip = Token da instância (Contacte o administrador do seu servidor para obter esta informação)
+WHATSAPP_SERVER_INSTANCE_NAME = Nome da instância WhatsApp
+WHATSAPP_SERVER_INSTANCE_NAMETooltip = Nome da instância (Contacte o administrador do seu servidor para obter esta informação)
+
+#
+# Mensagens e chat
+#
+WhatsappMessages = Mensagens do WhatsApp
+WhatsappSendMessage = Enviar WhatsApp
+WhatsappConfirmSendMessage = Tem a certeza de que deseja enviar esta mensagem?
+WhatsappHistory = Histórico de conversas
+WhatsappContacts = Contactos do WhatsApp
+WhatsappGroups = Grupos do WhatsApp
+WhatsappAttachment = Anexar ficheiro
+WhatsappSendTo = Enviar para
+WhatsappMessageSent = Mensagem enviada com sucesso
+WhatsappMessageFailed = Erro ao enviar a mensagem
+WhatsappNoMessages = Não há mensagens disponíveis
+WhatsappSearch = Pesquisar nas conversas
+ServerURL = URL do servidor
+Timestamp = Carimbo de data/hora
+APIKey = Chave API
+#
+# Estado e ligação
+#
+WhatsappStatus = Estado do WhatsApp
+WhatsappConnected = Ligado
+WhatsappConnectedToInstance = Ligado à instância <strong>%s</strong>
+WhatsappDisconnected = Desligado %s
+WhatsappConnecting = A ligar...
+WhatsappQRCode = Código QR para ligação
+WhatsappScanQR = Digitalize este código QR com o seu WhatsApp
+WhatsappConnectionExpired = Ligação expirada
+WhatsappRefreshQR = Atualizar código QR
+Content = Conteúdo
+DoSendSubject=Enviar assunto
+DoSendSubjectTooltip=Se o título for enviado, será enviado um tipo de mensagem especial com o seu cabeçalho e corpo.
+ContentAreRequired=O conteúdo é obrigatório
+IncludePDFFiles=Incluir ficheiros PDF
+#
+# Tipos de modelo
+#
+WhatsappToUser=Utilizadores
+WhatsappToMember=Membros
+RecruitmentCandidatures=Candidaturas
+WhatsappToThirdparty=Terceiros
+WhatsappToProject=Projetos
+WhatsappToSendProposal=Orçamentos
+WhatsappToSendOrder=Encomendas
+WhatsappToSendInvoice=Faturas
+WhatsappToSendShipment=Envios
+WhatsappToSendReception=Receções
+WhatsappToSendIntervention=Intervenções
+WhatsappToSendSupplierRequestForQuotation=Pedido de cotação a fornecedores
+WhatsappToSendSupplierOrder=Encomendas a fornecedores
+WhatsappToSendSupplierInvoice=Faturas de fornecedores
+WhatsappToSendContract=Contratos
+WhatsappToTicket=Tickets
+WhatsappToExpenseReport=Relatórios de despesas
+WhatsappToSendEventPush=Notificações de eventos
+WhatsappToSendEventOrganization=Organização de eventos
+WhatsappToPartnership=Parcerias
+WhatsappConfigurationMissing=Falta a configuração do WhatsApp
+# Etiquetas para objetos ligados
+Company=Empresa
+Invoice=Fatura
+Order=Encomenda
+Proposal=Orçamento
+Project=Projeto
+Contract=Contrato
+Ticket=Ticket
+Intervention=Intervenção
+Contact=Contacto
+SupplierInvoice=Fatura fornecedor
+SupplierOrder=Encomenda fornecedor
+SupplierProposal=Orçamento fornecedor
+Expense=Despesa
+ExpenseReport=Relatório de despesas
+Member=Membro
+Shipment=Envio
+Reception=Receção
+Delivery=Entrega
+Product=Produto
+Service=Serviço
+
+#
+# Notificações
+#
+WhatsappNotifications = Notificações do WhatsApp
+WhatsappEnableNotifications = Ativar notificações
+WhatsappDisableNotifications = Desativar notificações
+WhatsappNewMessage = Nova mensagem recebida
+WhatsappAPIStatus = Estado da API
+WhatsappAPISuccess = API a funcionar correctamente
+WhatsappAPIFailure = Erro na API
+WhatsappTestMessage = Mensagem de teste
+PhoneNumber = Número de telefone
+WhatsAppPhoneNumber = Número WhatsApp
+PhoneNumberFormat = Formato do número de telefone (Incluindo o código do país antes do número)
+Message = Mensagem
+MessageSentSuccessfully = Mensagem enviada com sucesso
+ErrorSendingMessage = Erro ao enviar a mensagem
+WhatsappLogoutSuccess = Sessão terminada com sucesso
+WhatsappLogoutError = Erro ao terminar a sessão
+SendTestMessage = Enviar mensagem de teste
+ScanQRCodeToConnect = Digitalize o código QR para ligar
+WhatsappConnectionInfo = Informação de ligação
+WhatsappConnectionSuccess = Ligação bem sucedida
+WhatsappConnectionError = Erro de ligação
+WhatsappConnectionFailed = Ligação falhada
+WhatsappReadyToUse = O WhatsApp está pronto a usar
+WHATSAPP_SEPARATOR = Parâmetros do WhatsApp
+WHATSAPP_PHONE_PREFIX = Prefixo do número de telefone
+WHATSAPP_PHONE_PREFIXTooltip = Prefixo do número de telefone (Exemplo: +351 para Portugal)
+WHATSAPP_PHONE_NUMBER = Número de telefone
+WHATSAPP_PHONE_NUMBERTooltip = Número de telefone (Exemplo: 912345678) Não inclua o prefixo nem espaços nem símbolos, apenas o número.
+WHATSAPP_SOCIETE_HAVE_WHASTAPP_CONFIGURED = <strong>O terceiro tem o WhatsApp configurado, mas o número fornecido pode não estar correto no envio.</strong>
+TypeOfTemplate = Tipo de modelo
+WhatsappTemplates= Modelos do WhatsApp
+NewWhatsappTemplates = Novo modelo
+ListWhatsappTemplates = Lista de modelos
+WhatsappWebhookLog = Registo do Webhook
+ListWhatsappWebhookLog = Lista de Webhooks
+WebhookLogs = Registos de Webhook
+NoContentToGenerateAudio = Não há conteúdo para gerar áudio
+GenerateAudioExample = Gerar áudio
+GenerateAudioExampleTooltip = Não é necessário gerar para enviar, é uma pré-visualização de como ficará a mensagem.
+SendAsAudio = Enviar como áudio %s
+SendAsAudioTooltip = Enviar como áudio (A mensagem será enviada como um ficheiro de áudio)
+Destination = Destino
+WebhhookEvent = Evento Webhook
+#
+# Mensagens e erros específicos
+#
+WhatsappConfigIncomplete = A configuração do WhatsApp está incompleta. Por favor, configure todos os parâmetros necessários.
+WhatsappInstanceNotOpen = A instância do WhatsApp não está aberta. Por favor, digitalize o código QR para ligar.
+WhatsappInvalidNumber = O número %s não é um número válido do WhatsApp.
+WhatsappAudioSendError = Erro ao enviar o áudio: %s
+WhatsappAudioGenerationError = Erro ao gerar o áudio. Por favor, tente novamente.
+WhatsappTextSendError = Erro ao enviar a mensagem: %s
+WhatsappPdfSendError = Erro ao enviar o ficheiro %s: %s
+WhatsappAttachmentError = Erro ao anexar o ficheiro
+WhatsappMediaProcessingError = Erro ao processar o ficheiro multimédia
+WhatsappTemplateNotFound = Modelo não encontrado
+WhatsappTemplateSaved = Modelo guardado com sucesso
+WhatsappTemplateDeleted = Modelo eliminado com sucesso
+WhatsappInvalidTemplate = Modelo inválido
+WhatsappInstance=Instância do WhatsApp
+#
+# Validación y confirmación
+#
+WhatsappConfirmLogout = Tem a certeza de que deseja terminar a sessão do WhatsApp?
+WhatsappNumberValidation = A validar número do WhatsApp...
+WhatsappNumberValid = Número do WhatsApp válido
+WhatsappNumberInvalid = Número do WhatsApp inválido
+WhatsappConfirmDelete = Tem a certeza de que deseja eliminar este elemento?
+WhatsappProcessing = A processar pedido...
+WhatsappConfirmSendingFiles = Tem a certeza de que deseja enviar estes ficheiros?
+
+#
+# Áudio e multimédia
+#
+WhatsappAudioPreview = Pré-visualização do áudio
+WhatsappRecordAudio = Gravar áudio
+WhatsappStopRecording = Parar gravação
+WhatsappPlayAudio = Reproduzir áudio
+WhatsappPauseAudio = Pausar áudio
+WhatsappDeleteAudio = Eliminar áudio
+WhatsappAudioTooLong = O áudio é demasiado longo (máximo 2 minutos)
+WhatsappAudioTooShort = O áudio é demasiado curto (mínimo 1 segundo)
+WhatsappConvertingText = A converter texto para áudio...
+
+#
+# Mensajes informativos
+#
+#
+# Mensagens informativas
+#
+WhatsappWaitingForScan = À espera da leitura do código QR...
+WhatsappConnectingToPhone = A ligar ao telemóvel...
+WhatsappCheckingConnection = A verificar ligação do WhatsApp...
+WhatsappReconnecting = A reconectar o WhatsApp...
+WhatsappUpdatingQR = A atualizar código QR...
+
+#
+# Mensajes específicos para el envío
+#
+WhatsappMessageFromSubject = Mensagem do WhatsApp %s
+WhatsappMessageReceived = WhatsApp recebido
+WhatsappMessageAudioFromSubject = Mensagem de áudio do WhatsApp %s
+WhatsappMessagePdfFromSubject = Mensagem de PDF do WhatsApp %s
+WhatsappMessageFooter = Enviado a partir do sistema ERP
+AudioMessageSentSuccessfully = Mensagem de áudio enviada com sucesso
+DocumentSentSuccessfully = Documento enviado com sucesso
+ImageSentSuccessfully = Imagem enviada com sucesso
+VideoSentSuccessfully = Vídeo enviado com sucesso
+FileSentSuccessfully = Ficheiro enviado com sucesso
+InstanceLogoutSuccessfully = Sessão encerrada com sucesso na instância do WhatsApp
+WhatsappImageProcessing = A processar imagem...
+WhatsappVideoProcessing = A processar vídeo...
+WhatsappAudioProcessing = A processar áudio...
+WhatsappSubjectSendError = Erro ao enviar o assunto: %s
+WhatsappContentSendError = Erro ao enviar o conteúdo: %s
+WhatsappProcessingAudio = A processar ficheiro de áudio...
+WhatsappGeneratingAudio = A gerar áudio a partir do texto...
+WhatsappSending = A enviar...
+WhatsappSendComplete = Envio concluído
+ActionAC_SEND_WHATSAPP = Envio de WhatsApp
+ActionSEND_WHATSAPP_AUDIO = Envio de WhatsApp Áudio
+ActionSEND_WHATSAPP_PDF = Envio de WhatsApp PDF
+ActionAC_RECEIVE_WHATSAPP = Receção de WhatsApp
+ActionAC_SEND_WHATSAPP_NOTIFY = Lembrete do WhatsApp
+WhatsappHistoryTab = Histórico do WhatsApp
+WhatsAppHistory = Histórico do WhatsApp
+MessageHistory = Histórico de mensagens
+NoMessagesYet = Ainda não há mensagens
+WHATSAPP_WEBHOOK_ALLOW = Permitir Webhook
+WHATSAPP_WEBHOOK_ALLOWTooltip = Permitir Webhook (Ativar ou desativar o webhook para receber notificações), o webhook deve ser configurado no servidor pelo administrador.
+WHATSAPP_WEBHOOK_USER_ID = Utilizador do Webhook
+WHATSAPP_WEBHOOK_USER_IDTooltip = Utilizador do Webhook (Contacte o administrador do seu servidor para obter esta informação)
+MissingParameters = Parâmetros não encontrados
+WhatsappMessageNotSend = Não enviado
+WhatsappMessageSend = Enviado %s
+WHATSAPP_MESSAGE_SENT_ON_TIME = Mensagem enviada na data e hora
+WHATSAPP_MESSAGE_SENT_ON_TIMETooltip= Indica a hora em que a mensagem foi enviada
+LoadingMessages = A carregar mensagens...
+ErrorLoadingMessages = Erro ao carregar mensagens
+CronjobWhatsappSendReminder = Envio de lembrete do WhatsApp
+CronjobWhatsappSendReminderComment = Esta tarefa agendada envia um lembrete do WhatsApp aos utilizadores com mensagens pendentes.
+WHATSAPP_SHOW_ON_GETNOMURL = Mostrar chat ligado a cada objeto a partir do seu LINK
+WHATSAPP_SHOW_ON_GETNOMURLTooltip = Mostrar chat ligado a cada objeto a partir do seu LINK (Ativar ou desativar a visualização do chat ligado a cada objeto a partir do seu link)
+MAIN_WHATSAPP_PHONE_PREFIX= Prefixo do número de telefone por defeito
+PlanUsage=Uso do plano
