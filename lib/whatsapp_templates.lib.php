@@ -61,15 +61,15 @@ function templatesPrepareHead($object)
 	return $head;
 }
 
-function getWhatsappTemplatesArray($element=null)
+function getWhatsappTemplatesArray($element = null)
 {
 	global $db;
 
-	$sql = "SELECT * FROM llx_whatsapp_templates WHERE 1=1 AND type_template = 'all'";
-	if($element){
-		$sql.=" OR type_template = '".$db->escape($element)."'";
+	$sql = "SELECT * FROM " . MAIN_DB_PREFIX . "whatsapp_templates WHERE 1=1 AND type_template = 'all'";
+	if ($element) {
+		$sql .= " OR type_template = '" . $db->escape($element) . "'";
 	}
-	$sql.=" ORDER BY type_template ASC";
+	$sql .= " ORDER BY type_template ASC";
 	$resql = $db->query($sql);
 	if ($resql) {
 		$whatsappTemplates = array();
@@ -80,5 +80,4 @@ function getWhatsappTemplatesArray($element=null)
 	} else {
 		return false;
 	}
-
 }

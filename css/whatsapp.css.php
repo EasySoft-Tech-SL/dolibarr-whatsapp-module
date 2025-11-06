@@ -1049,31 +1049,40 @@ if (empty($dolibarr_nocache)) {
 /* Opciones completamente rediseñadas */
 .wa-options {
   position: absolute !important;
-  bottom: 80px !important;
-  right: 10px !important;
+  bottom: 85px !important;
+  right: 5px !important;
   display: flex !important;
   flex-direction: column !important;
+  gap: 12px !important;
   visibility: hidden !important;
   opacity: 0 !important;
-  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
-  z-index: 1000 !important;
+  transform: translateY(20px) scale(0.8) !important;
+  transition: all 0.35s cubic-bezier(0.68, -0.55, 0.265, 1.55) !important;
+  z-index: 999 !important;
+  pointer-events: none !important;
+}
 
+/* Mostrar opciones solo al hacer hover en el container */
+.wa-floating-container:hover .wa-options {
+  visibility: visible !important;
+  opacity: 1 !important;
+  transform: translateY(0) scale(1) !important;
+  pointer-events: all !important;
 }
 
 .wa-option {
   display: flex !important;
   align-items: center !important;
-  padding: 14px !important;
-  margin-bottom: 16px !important;
+  padding: 12px 16px !important;
   background: white !important;
-  border-radius: 16px !important;
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15), 0 -1px 0 rgba(255, 255, 255, 0.8) inset !important;
+  border-radius: 50px !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12) !important;
   transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
-  overflow: hidden !important;
   text-decoration: none !important;
   position: relative !important;
-  transform: translateY(25px) translateX(25px) !important;
-  opacity: 0 !important;
+  overflow: hidden !important;
+  min-width: 180px !important;
+  border: 1px solid rgba(0, 0, 0, 0.06) !important;
 }
 
 .wa-option:before {
@@ -1081,89 +1090,72 @@ if (empty($dolibarr_nocache)) {
   position: absolute !important;
   top: 0 !important;
   left: 0 !important;
-  width: 100% !important;
+  width: 0 !important;
   height: 100% !important;
-  background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 50%) !important;
-  z-index: 1 !important;
+  background: linear-gradient(90deg, rgba(37,211,102,0.08) 0%, rgba(18,140,126,0.08) 100%) !important;
+  transition: width 0.3s ease !important;
+  z-index: 0 !important;
+}
+
+.wa-option:hover:before {
+  width: 100% !important;
 }
 
 .wa-option-icon {
-  width: 48px !important;
-  height: 48px !important;
-  border-radius: 12px !important;
+  width: 40px !important;
+  height: 40px !important;
+  border-radius: 50% !important;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
-  margin-right: 14px !important;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15) !important;
+  margin-right: 12px !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
   position: relative !important;
-  overflow: hidden !important;
   flex-shrink: 0 !important;
-}
-
-.wa-option-icon:before {
-  content: '' !important;
-  position: absolute !important;
-  top: 0 !important;
-  left: 0 !important;
-  width: 100% !important;
-  height: 100% !important;
-  background: linear-gradient(135deg, rgba(255,255,255,0.25) 0%, rgba(255,255,255,0) 60%) !important;
   z-index: 1 !important;
 }
 
 .wa-option:nth-child(1) .wa-option-icon {
-  background: linear-gradient(135deg, #25D366 0%, #128C7E 100%) !important;
+  background: linear-gradient(135deg, #25D366 0%, #20BA5A 100%) !important;
 }
 
 .wa-option:nth-child(2) .wa-option-icon {
-  background: linear-gradient(135deg, #4776E6 0%, #8E54E9 100%) !important;
+  background: linear-gradient(135deg, #667EEA 0%, #5A67D8 100%) !important;
 }
 
 .wa-option-icon i {
   color: white !important;
-  font-size: 22px !important;
-  z-index: 2 !important;
+  font-size: 18px !important;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2) !important;
 }
 
 .wa-option-text {
-  color: #333 !important;
+  color: #2D3748 !important;
   font-weight: 600 !important;
-  font-size: 15px !important;
+  font-size: 14px !important;
   white-space: nowrap !important;
-  letter-spacing: -0.3px !important;
   flex-grow: 1 !important;
+  z-index: 1 !important;
+  position: relative !important;
 }
 
 .wa-option:hover {
-  transform: translateX(-10px) !important;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2), 0 -1px 0 rgba(255, 255, 255, 0.8) inset !important;
-  background: linear-gradient(135deg, #ffffff 0%, #f5f5f5 100%) !important;
+  transform: translateX(-8px) scale(1.03) !important;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.16) !important;
 }
 
 .wa-option:active {
-  transform: translateX(-5px) scale(0.98) !important;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1), 0 -1px 0 rgba(255, 255, 255, 0.8) inset !important;
+  transform: translateX(-4px) scale(0.98) !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12) !important;
 }
 
-/* Animación para las opciones */
-.wa-options.active {
-  visibility: visible !important;
-  opacity: 1 !important;
-}
-
-.wa-options.active .wa-option {
-  opacity: 1 !important;
-  transform: translateY(0) translateX(0) !important;
-}
-
-.wa-options.active .wa-option:nth-child(1) {
+/* Animación escalonada para las opciones */
+.wa-floating-container:hover .wa-option:nth-child(1) {
   transition-delay: 0.05s !important;
 }
 
-.wa-options.active .wa-option:nth-child(2) {
-  transition-delay: 0.15s !important;
+.wa-floating-container:hover .wa-option:nth-child(2) {
+  transition-delay: 0.1s !important;
 }
 
 /* Pulse animation modified */
@@ -1209,54 +1201,86 @@ if (empty($dolibarr_nocache)) {
 /* Responsive styles */
 @media (max-width: 768px) {
   .wa-floating-container {
-    bottom: 25px !important;
-    right: 25px !important;
+    bottom: 20px !important;
+    right: 20px !important;
   }
 
   .wa-main-button {
-    width: 65px !important;
-    height: 65px !important;
-  }
-
-  .wa-main-button img {
     width: 60px !important;
     height: 60px !important;
   }
 
+  .wa-main-button img {
+    width: 50px !important;
+    height: 50px !important;
+  }
+
   .wa-options {
-    width: 200px !important;
     bottom: 75px !important;
+    right: 0px !important;
   }
 
   .wa-option {
-    padding: 12px !important;
-    margin-bottom: 14px !important;
-  }
-
-  .wa-option-icon {
-    width: 40px !important;
-    height: 40px !important;
-    margin-right: 12px !important;
-  }
-
-  .wa-option-text {
-    font-size: 14px !important;
-  }
-}
-
-/* Super pequeños dispositivos */
-@media (max-width: 480px) {
-  .wa-options {
-    width: 180px !important;
+    padding: 10px 14px !important;
+    min-width: 160px !important;
   }
 
   .wa-option-icon {
     width: 36px !important;
     height: 36px !important;
+    margin-right: 10px !important;
   }
 
   .wa-option-icon i {
-    font-size: 18px !important;
+    font-size: 16px !important;
+  }
+
+  .wa-option-text {
+    font-size: 13px !important;
+  }
+
+  .wa-badge {
+    top: -6px !important;
+    right: -6px !important;
+    font-size: 10px !important;
+    padding: 2px 6px !important;
+    min-width: 20px !important;
+    height: auto !important;
+  }
+}
+
+/* Super pequeños dispositivos */
+@media (max-width: 480px) {
+  .wa-floating-container {
+    bottom: 15px !important;
+    right: 15px !important;
+  }
+
+  .wa-main-button {
+    width: 55px !important;
+    height: 55px !important;
+  }
+
+  .wa-main-button img {
+    width: 45px !important;
+    height: 45px !important;
+  }
+
+  .wa-options {
+    min-width: 150px !important;
+  }
+
+  .wa-option {
+    min-width: 150px !important;
+  }
+
+  .wa-option-icon {
+    width: 32px !important;
+    height: 32px !important;
+  }
+
+  .wa-option-icon i {
+    font-size: 14px !important;
   }
 }
 

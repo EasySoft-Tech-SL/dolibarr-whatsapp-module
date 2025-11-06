@@ -110,6 +110,7 @@ Content = Inhalt
 DoSendSubject=Betreff senden
 DoSendSubjectTooltip=Wenn der Titel gesendet wird, wird eine spezielle Art von Nachricht mit Kopfzeile und Nachrichtentext gesendet.
 ContentAreRequired=Inhalt ist erforderlich
+PhoneNumberAreRequired=Telefonnummer ist erforderlich
 IncludePDFFiles=PDF-Dateien einschließen
 #
 # Vorlagentypen

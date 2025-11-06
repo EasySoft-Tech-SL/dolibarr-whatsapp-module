@@ -110,6 +110,7 @@ Content = Contenu
 DoSendSubject=Envoyer le sujet
 DoSendSubjectTooltip=Si le titre est envoyé, un type de message spécial avec son en-tête et le corps du message sera envoyé.
 ContentAreRequired=Le contenu est obligatoire
+PhoneNumberAreRequired=Le numéro de téléphone est obligatoire
 IncludePDFFiles=Inclure les fichiers PDF
 #
 # Types de modèles

@@ -110,6 +110,7 @@ Content = Content
 DoSendSubject=Send subject
 DoSendSubjectTooltip=If the title is sent, a special type of message with its header and message body will be sent.
 ContentAreRequired=Content is required
+PhoneNumberAreRequired=Phone number is required
 IncludePDFFiles=Include PDF files
 #
 # Template types

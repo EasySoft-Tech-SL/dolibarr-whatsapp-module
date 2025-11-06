@@ -110,6 +110,7 @@ Content = Contenido
 DoSendSubject=Enviar asunto
 DoSendSubjectTooltip=Si se envia el titulo se enviara un tipo de mensaje especial con su cabacera y cuerpo del mensaje.
 ContentAreRequired=El contenido es obligatorio
+PhoneNumberAreRequired=El número de teléfono es obligatorio
 IncludePDFFiles=Incluir archivos PDF
 #
 # Tipos de plantilla

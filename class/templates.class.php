@@ -240,7 +240,7 @@ class Templates extends CommonObject
 			$elementList['recruitmentcandidature'] = img_picto('', 'recruitmentcandidature', 'class="pictofixedwidth"') . dol_escape_htmltag($langs->trans('RecruitmentCandidatures'));
 		}
 		if (!empty($conf->societe->enabled) && !empty($user->rights->societe->lire)) {
-			$elementList['thirdparty'] = img_picto('', 'company', 'class="pictofixedwidth"') . dol_escape_htmltag($langs->trans('WhatsappToThirdparty'));
+			$elementList['societe'] = img_picto('', 'company', 'class="pictofixedwidth"') . dol_escape_htmltag($langs->trans('WhatsappToThirdparty'));
 		}
 		if (!empty($conf->project->enabled)) {
 			$elementList['project'] = img_picto('', 'project', 'class="pictofixedwidth"') . dol_escape_htmltag($langs->trans('WhatsappToProject'));

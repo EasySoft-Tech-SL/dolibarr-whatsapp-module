@@ -142,26 +142,41 @@ class ActionsWhatsapp
 			dol_include_once('/whatsapp/lib/whatsapp_templates.lib.php');
 			dol_include_once('/whatsapp/lib/whatsapp.lib.php');
 
-			$subject = GETPOST('topic', 'html');
-			$content = GETPOST('content', 'html');
+			$subject = GETPOST('topic', 'restricthtml');
+			$content = GETPOST('content', 'restricthtml');
 			$whatsappNumber = GETPOST('whatsapp_number', 'alpha');
 			$templateId = GETPOST('whatsapp_template', 'int');
 			$sendSubject = GETPOST('send_subject', 'alpha') == 'on';
 			$sendAsAudio = GETPOST('send_as_audio', 'alpha') == 'on';
 			$whatsappPdfFiles = GETPOST('whatsapp_pdf_files', 'array');
 
+			// Validar que el número de WhatsApp no esté vacío
+			if (empty($whatsappNumber) || $whatsappNumber == '') {
+				setEventMessages($langs->trans('PhoneNumberAreRequired'), null, 'errors');
+				$url = $_SERVER['PHP_SELF'] . '?id=' . $object->id . '&token=' . newToken() . '&action=send_whatsapp_form';
+				$url .= '&whatsapp_template=' . $templateId;
+				$url .= '&topic=' . urlencode($subject);
+				$url .= '&content=' . urlencode($content);
+				$url .= '&send_subject=' . ($sendSubject ? 'on' : 'off');
+
+				echo '
+				<script type="text/javascript">
+					window.location.href = "' . $url . '";
+				</script>';
+				exit;
+			}
 
 			//Si el contenido es vacio o nulo error
 			if (empty($content) or $content == '') {
-				setEventMessages('ContentAreRequired', null, 'errors');
+				setEventMessages($langs->trans('ContentAreRequired'), null, 'errors');
 				//Header back
 				//redirect with javascript $_SERVER['PHP_SELF'] . '?id=' . $object->id . '&token=' . newToken() . '&action=send_whatsapp_form'
 				$url = $_SERVER['PHP_SELF'] . '?id=' . $object->id . '&token=' . newToken() . '&action=send_whatsapp_form';
 				$url .= '&whatsapp_template=' . $templateId;
-				$url .= '&topic=' . $subject;
-				$url .= '&content=' . $content;
+				$url .= '&topic=' . urlencode($subject);
+				$url .= '&content=' . urlencode($content);
 				$url .= '&whatsapp_number=' . $whatsappNumber;
-				$url .= '&send_subject=' . $sendSubject;
+				$url .= '&send_subject=' . ($sendSubject ? 'on' : 'off');
 
 				echo '
 				<script type="text/javascript">
@@ -331,7 +346,7 @@ class ActionsWhatsapp
 				$object->actiontypecode = 'AC_SEND_WHATSAPP';
 
 				$object->call_trigger('SEND_WHATSAPP', $user); */
-				setEventMessages($langs->trans("WhatsappMessageSent"), null, 'mesgs');
+				setEventMessage($langs->trans("WhatsappMessageSent"));
 			}
 
 			// Redireccionar de vuelta a la página del objeto
@@ -521,14 +536,24 @@ class ActionsWhatsapp
 								var $templateSelect = $("#whatsapp_template");
 								var $contentPreview = $("#whatsapp_template_preview");
 								var $contentField = $("#content");
-								var EDITOR = CKEDITOR?.instances?.whatsapp_template_preview;
-								//Cuando el contenido del editor cambie actualiza el campo oculto
-								if (EDITOR) {
-									EDITOR.on("change", function() {
-										$contentField.val(EDITOR.getData());
-									});
-								}
 								var $topicField = $("#topic");
+
+								// Detectar si CKEDITOR está disponible y activo
+								var EDITOR = null;
+								var hasCKEditor = false;
+
+								// Esperar un momento para que CKEDITOR se inicialice si existe
+								setTimeout(function() {
+									if (typeof CKEDITOR !== "undefined" && CKEDITOR.instances && CKEDITOR.instances.whatsapp_template_preview) {
+										EDITOR = CKEDITOR.instances.whatsapp_template_preview;
+										hasCKEditor = true;
+
+										// Cuando el contenido del editor cambie, actualiza el campo oculto
+										EDITOR.on("change", function() {
+											$contentField.val(EDITOR.getData());
+										});
+									}
+								}, 500);
 
 								// Función optimizada para aplicar sustituciones
 								function applySubstitutions(text) {
@@ -540,7 +565,34 @@ class ActionsWhatsapp
 									});
 								}
 
-								// Función para actualizar el contenido
+								// Función para obtener el contenido actual (compatible con textarea y CKEditor)
+								function getCurrentContent() {
+									if (hasCKEditor && EDITOR) {
+										return EDITOR.getData();
+									} else {
+										return $contentPreview.val();
+									}
+								}
+
+								// Función para establecer el contenido (compatible con textarea y CKEditor)
+								function setContent(content) {
+									if (hasCKEditor && EDITOR) {
+										EDITOR.setData(content);
+									} else {
+										$contentPreview.val(content);
+									}
+									// Actualizar también el campo oculto
+									$contentField.val(content);
+								}
+
+								// Si no hay CKEditor, sincronizar manualmente el textarea con el campo oculto
+								if (!hasCKEditor) {
+									$contentPreview.on("input change", function() {
+										$contentField.val($(this).val());
+									});
+								}
+
+								// Función para actualizar el contenido de la plantilla
 								function updateTemplateContent() {
 									var selectedTemplateId = $templateSelect.val();
 									var selectedTemplate = whatsappTemplates[selectedTemplateId] || {};
@@ -553,21 +605,19 @@ class ActionsWhatsapp
 									var processedContent = applySubstitutions(rawContent);
 									var processedTopic = applySubstitutions(rawTopic);
 
-									// Actualizar los campos
-									$contentPreview.val(processedContent);
+									// Actualizar los campos usando la función compatible
+									setContent(processedContent);
 									$topicField.val(processedTopic);
-									if (EDITOR) {
-										EDITOR.setData(processedContent);
-									}
+
+									// Generar audio si hay contenido
 									if(processedContent != "" && processedContent != null && processedContent.length > 0){
-										//Generar audio
 										generateAudio(processedContent);
 									}
 								}
-								//Funcion para generar audio
+
+								// Función para generar audio
 								function generateAudio(text){
-								//Llama a la url https://erp-v16.local/custom/whatsapp/ajax/textToAudio.php?text=Hola_como_estas esto devuelve un payload
-								//en formato ["status" => "success", "audio" => $base64Audio]); y crea un div con el audio dentro del elemento audio_example
+									// Llama a la url de conversión de texto a audio
 									$.ajax({
 										url: "' . dol_buildpath('/whatsapp/ajax/textToAudio.php', 1) . '",
 										type: "POST",
@@ -588,10 +638,9 @@ class ActionsWhatsapp
 											console.error("Error en la solicitud AJAX:", error);
 										}
 									});
-
 								}
 
-								// Asignar evento change
+								// Asignar evento change al selector de plantillas
 								$templateSelect.on("change", updateTemplateContent);
 
 								// Inicialización: seleccionar primera opción si no hay selección
@@ -599,24 +648,22 @@ class ActionsWhatsapp
 									$templateSelect.val($templateSelect.find("option:first").val()).trigger("change");
 								} else {
 									// O inicializar con la plantilla ya seleccionada
-									updateTemplateContent();
+									setTimeout(function() {
+										updateTemplateContent();
+									}, 600);
 								}
-									//Si click en el boton de generar audio cogemos el contenidor del editor y lo enviamos
+
+								// Botón de generar audio - compatible con ambos modos
 								$("#generate_audio").on("click", function() {
-									var content = EDITOR ? EDITOR.getData() : $contentField.val();
+									var content = getCurrentContent();
 									if (content != "" && content != null && content.length > 0) {
 										generateAudio(content);
 									} else {
-										$.jnotify("' . $langs->trans('NoContentToGenerateAudio') . '", "error", {
-											//position: "top",
-											//sticky: true,
-											//timeout: 2000,
-											//fadeout: 1000,
-											//showClose: true
-										});
+										$.jnotify("' . $langs->trans('NoContentToGenerateAudio') . '", "error");
 									}
 								});
-								//Si el checkbox de enviar como audio esta activado mostrar hacer toggle del div
+
+								// Toggle del div de audio cuando se activa el checkbox
 								$("#send_as_audio").on("change", function() {
 									if ($(this).is(":checked")) {
 										$("#audio_div").show();
@@ -624,7 +671,8 @@ class ActionsWhatsapp
 										$("#audio_div").hide();
 									}
 								});
-								//al tributo con id whatsapp_pdf_files cambia la etiqueta name a whatsapp_pdf_files[]
+
+								// Cambiar el nombre del atributo para enviar como array
 								$("#whatsapp_pdf_files").attr("name", "whatsapp_pdf_files[]");
 							});
 						</script>')
