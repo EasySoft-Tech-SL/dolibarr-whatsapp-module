@@ -143,10 +143,12 @@ if (isset($eventData['data']['messageTimestamp'])) {
 // Extraer información relevante para WebhookLog
 $eventType = isset($eventData['event']) ? $eventData['event'] : 'desconocido';
 $instanceName = isset($eventData['instance']) ? $eventData['instance'] : 'desconocida';
+$phoneDestination = isset($eventData['data']['key']['remoteJid']) ? $eventData['data']['key']['remoteJid'] : '';
 $sender = isset($eventData['sender']) ? $eventData['sender'] : '';
 $destination = isset($eventData['destination']) ? $eventData['destination'] : '';
 $serverUrl = isset($eventData['server_url']) ? $eventData['server_url'] : '';
 $apikey = isset($eventData['apikey']) ? $eventData['apikey'] : '';
+$fromMe = $eventData['data']['key']['fromMe'] ?? false;
 
 try {
 
@@ -157,7 +159,7 @@ try {
 		// createAgendaEvent($eventData);
 
 		//Primero buscamos el sender usando 34$phone@s.whatsapp.net la parte del telefono 34 66143134
-		$phoneext = explode('@', $sender)[0];
+		$phoneext = explode('@', $phoneDestination)[0];
 		$phone = substr($phoneext, 2);
 		$prefix = substr($phoneext, 0, 2);
 		if (!empty($phone)) {
@@ -172,12 +174,12 @@ try {
 				dol_include_once('/societe/class/societe.class.php');
 				$societe = new Societe($db);
 				if ($societe->fetch($object->rowid)) {
-					$text = isset($eventData['data']['message']['conversation']) ? $eventData['data']['message']['conversation'] : '';
+					$text = isset($eventData['data']['message']['conversation']) ? $eventData['data']['message']['conversation'] : '---';
 					insertActionIntoAgenda(
 						$societe,
-						$langs->trans('WhatsApp recibido'),
+						$langs->trans('WhatsappMessageReceived'),
 						$text,
-						'AC_RECEIVE_WHATSAPP',
+						$fromMe ? 'AC_SEND_WHATSAPP' : 'AC_RECEIVE_WHATSAPP',
 						$societe->id,
 						$societe->element,
 						$timestamp,
