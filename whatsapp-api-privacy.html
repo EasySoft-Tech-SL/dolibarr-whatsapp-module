@@ -1,0 +1,975 @@
+<!-- POLÍTICA DE PRIVACIDAD - WHATSAPP API SERVICE -->
+<!-- Copia y pega este código en un widget HTML de Elementor o úsalo como página independiente -->
+
+<style>
+  /* ========================================= */
+  /* ESTILOS OPTIMIZADOS PARA ELEMENTOR/WORDPRESS */
+  /* ========================================= */
+  /* Reset de estilos de WordPress/Elementor */
+  .whatsapp-api-privacy-wrapper * {
+    box-sizing: border-box !important;
+  }
+  /* Contenedor principal - Encapsulado para Elementor */
+  .whatsapp-api-privacy-wrapper {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+      "Helvetica Neue", Arial, sans-serif !important;
+    line-height: 1.6 !important;
+    color: #333 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 auto !important;
+    padding: 0 !important;
+    background: transparent !important;
+  }
+  .whatsapp-api-privacy-wrapper .privacy-policy-container {
+    width: 100% !important;
+    max-width: 1200px !important;
+    padding: 40px 30px !important;
+    margin: 0 auto !important;
+    background-color: #ffffff !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08) !important;
+    border-radius: 10px !important;
+  }
+  /* Títulos - Optimizados para Elementor */
+  .whatsapp-api-privacy-wrapper h1 {
+    color: #075e54 !important;
+    font-size: clamp(1.8em, 5vw, 2.2em) !important;
+    margin: 0 0 20px 0 !important;
+    padding: 0 0 15px 0 !important;
+    border-bottom: 4px solid #25d366 !important;
+    line-height: 1.3 !important;
+    font-weight: 700 !important;
+    letter-spacing: -0.5px !important;
+  }
+  .whatsapp-api-privacy-wrapper h2 {
+    color: #075e54 !important;
+    font-size: clamp(1.3em, 4vw, 1.5em) !important;
+    margin: 40px 0 20px 0 !important;
+    padding: 12px 0 12px 20px !important;
+    border-left: 5px solid #25d366 !important;
+    line-height: 1.4 !important;
+    font-weight: 600 !important;
+    background: rgba(37, 211, 102, 0.03) !important;
+    border-radius: 0 4px 4px 0 !important;
+  }
+  .whatsapp-api-privacy-wrapper h3 {
+    color: #34495e !important;
+    font-size: 1.15em !important;
+    margin: 25px 0 15px 0 !important;
+    padding: 0 !important;
+    font-weight: 600 !important;
+    line-height: 1.4 !important;
+  }
+  .whatsapp-api-privacy-wrapper h4 {
+    color: #555 !important;
+    font-size: 1em !important;
+    margin: 20px 0 12px 0 !important;
+    padding: 0 !important;
+    font-weight: 600 !important;
+    line-height: 1.5 !important;
+  }
+  .whatsapp-api-privacy-wrapper p {
+    margin-bottom: 15px;
+    text-align: justify;
+    line-height: 1.8;
+  }
+  .whatsapp-api-privacy-wrapper ul {
+    margin: 15px 0;
+    padding-left: 40px;
+  }
+  .whatsapp-api-privacy-wrapper li {
+    margin-bottom: 10px;
+    line-height: 1.7;
+  }
+  .whatsapp-api-privacy-wrapper ol {
+    margin: 15px 0;
+    padding-left: 40px;
+  }
+  .whatsapp-api-privacy-wrapper ol li {
+    margin-bottom: 10px;
+  }
+  .whatsapp-api-privacy-wrapper .section {
+    margin-bottom: 35px;
+  }
+  .whatsapp-api-privacy-wrapper hr {
+    border: none;
+    border-top: 2px solid #e0e0e0;
+    margin: 35px 0;
+  }
+  /* Cajas de alerta/info - Mejoradas para Elementor */
+  .whatsapp-api-privacy-wrapper .alert-box {
+    border-left: 5px solid #e74c3c !important;
+    padding: 25px !important;
+    margin: 30px 0 !important;
+    border-radius: 8px !important;
+    background: linear-gradient(135deg, #fadbd8 0%, #fff0ee 100%) !important;
+    box-shadow: 0 3px 12px rgba(231, 76, 60, 0.15) !important;
+    transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+  }
+  .whatsapp-api-privacy-wrapper .alert-box:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 5px 20px rgba(231, 76, 60, 0.2) !important;
+  }
+  .whatsapp-api-privacy-wrapper .alert-box strong {
+    color: #c0392b !important;
+    display: block !important;
+    margin-bottom: 12px !important;
+    font-size: 1.15em !important;
+    font-weight: 700 !important;
+  }
+  .whatsapp-api-privacy-wrapper .alert-box p {
+    margin: 0 0 10px 0 !important;
+    color: #922b21 !important;
+    line-height: 1.7 !important;
+  }
+  .whatsapp-api-privacy-wrapper .alert-box ul {
+    margin: 15px 0 0 0 !important;
+    padding-left: 25px !important;
+  }
+  .whatsapp-api-privacy-wrapper .info-box {
+    border-left: 5px solid #3498db !important;
+    padding: 25px !important;
+    margin: 30px 0 !important;
+    border-radius: 8px !important;
+    background: linear-gradient(135deg, #d6eaf8 0%, #ebf5fb 100%) !important;
+    box-shadow: 0 3px 12px rgba(52, 152, 219, 0.15) !important;
+    transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+  }
+  .whatsapp-api-privacy-wrapper .info-box:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 5px 20px rgba(52, 152, 219, 0.2) !important;
+  }
+  .whatsapp-api-privacy-wrapper .info-box strong {
+    color: #1a5276 !important;
+    display: block !important;
+    margin-bottom: 12px !important;
+    font-size: 1.1em !important;
+    font-weight: 700 !important;
+  }
+  .whatsapp-api-privacy-wrapper .info-box p {
+    margin: 0 0 10px 0 !important;
+    color: #1e5c8e !important;
+    line-height: 1.7 !important;
+  }
+  .whatsapp-api-privacy-wrapper .info-box ul {
+    margin: 15px 0 0 0 !important;
+    padding-left: 25px !important;
+  }
+  .whatsapp-api-privacy-wrapper .success-box {
+    border-left: 5px solid #27ae60 !important;
+    padding: 25px !important;
+    margin: 30px 0 !important;
+    border-radius: 8px !important;
+    background: linear-gradient(135deg, #d5f4e6 0%, #eafaf1 100%) !important;
+    box-shadow: 0 3px 12px rgba(39, 174, 96, 0.15) !important;
+    transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+  }
+  .whatsapp-api-privacy-wrapper .success-box:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 5px 20px rgba(39, 174, 96, 0.2) !important;
+  }
+  .whatsapp-api-privacy-wrapper .success-box strong {
+    color: #1e8449 !important;
+    display: block !important;
+    margin-bottom: 12px !important;
+    font-size: 1.1em !important;
+    font-weight: 700 !important;
+  }
+  .whatsapp-api-privacy-wrapper table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+  }
+  .whatsapp-api-privacy-wrapper table th {
+    background-color: #075e54;
+    color: white;
+    padding: 12px;
+    text-align: left;
+    font-weight: 600;
+  }
+  .whatsapp-api-privacy-wrapper table td {
+    padding: 12px;
+    border-bottom: 1px solid #ecf0f1;
+  }
+  .whatsapp-api-privacy-wrapper table tbody tr:nth-child(even) {
+    background-color: #f9f9f9;
+  }
+  .whatsapp-api-privacy-wrapper table tbody tr:hover {
+    background-color: #ecf0f1;
+  }
+  .whatsapp-api-privacy-wrapper .highlight {
+    background-color: #ffffcc;
+    padding: 2px 4px;
+    border-radius: 2px;
+  }
+  .whatsapp-api-privacy-wrapper .footer-note {
+    margin-top: 40px;
+    padding-top: 30px;
+    border-top: 2px solid #e0e0e0;
+    text-align: center;
+    color: #7f8c8d;
+    font-size: 0.9em;
+  }
+  .whatsapp-api-privacy-wrapper .toc {
+    background-color: #f8f9fa;
+    border-left: 4px solid #25d366;
+    padding: 20px 25px;
+    margin: 30px 0;
+    border-radius: 5px;
+  }
+  .whatsapp-api-privacy-wrapper .toc h3 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    color: #2c3e50;
+  }
+  .whatsapp-api-privacy-wrapper .toc ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  .whatsapp-api-privacy-wrapper .toc li {
+    margin-bottom: 8px;
+  }
+  .whatsapp-api-privacy-wrapper .toc a {
+    color: #25d366;
+    text-decoration: none;
+    font-size: 0.95em;
+    transition: color 0.2s;
+  }
+  .whatsapp-api-privacy-wrapper .toc a:hover {
+    color: #075e54;
+    text-decoration: underline;
+  }
+  .whatsapp-api-privacy-wrapper .header-info {
+    background: linear-gradient(135deg, #e8f5e9 0%, #f1f8f6 100%);
+    padding: 25px;
+    border-radius: 8px;
+    margin-bottom: 35px;
+    border-left: 5px solid #25d366;
+  }
+  .whatsapp-api-privacy-wrapper .header-info h2 {
+    margin-top: 0;
+    border: none;
+    padding: 0;
+    color: #075e54;
+  }
+  .whatsapp-api-privacy-wrapper .header-info p {
+    margin: 8px 0;
+    line-height: 1.8;
+  }
+  .whatsapp-api-privacy-wrapper .header-info strong {
+    color: #075e54;
+    font-weight: 600;
+  }
+  /* Responsividad mejorada para Elementor/WordPress */
+  @media (max-width: 1024px) {
+    .whatsapp-api-privacy-wrapper .privacy-policy-container {
+      padding: 30px 25px !important;
+    }
+  }
+  @media (max-width: 768px) {
+    .whatsapp-api-privacy-wrapper .privacy-policy-container {
+      padding: 20px 15px !important;
+      border-radius: 0 !important;
+    }
+    .whatsapp-api-privacy-wrapper h1 {
+      font-size: 1.6em !important;
+      padding-bottom: 12px !important;
+    }
+    .whatsapp-api-privacy-wrapper h2 {
+      font-size: 1.3em !important;
+      padding-left: 15px !important;
+      margin-top: 30px !important;
+    }
+    .whatsapp-api-privacy-wrapper h3 {
+      font-size: 1.1em !important;
+    }
+    .whatsapp-api-privacy-wrapper .alert-box,
+    .whatsapp-api-privacy-wrapper .info-box,
+    .whatsapp-api-privacy-wrapper .success-box {
+      padding: 18px !important;
+      margin: 20px 0 !important;
+    }
+    .whatsapp-api-privacy-wrapper .header-info {
+      padding: 20px !important;
+    }
+    .whatsapp-api-privacy-wrapper .toc {
+      padding: 15px 18px !important;
+    }
+    .whatsapp-api-privacy-wrapper table {
+      font-size: 0.85em !important;
+      display: block !important;
+      overflow-x: auto !important;
+      white-space: nowrap !important;
+    }
+    .whatsapp-api-privacy-wrapper table th,
+    .whatsapp-api-privacy-wrapper table td {
+      padding: 10px 8px !important;
+    }
+    .whatsapp-api-privacy-wrapper ul,
+    .whatsapp-api-privacy-wrapper ol {
+      padding-left: 25px !important;
+    }
+  }
+  @media (max-width: 480px) {
+    .whatsapp-api-privacy-wrapper .privacy-policy-container {
+      padding: 15px 10px !important;
+    }
+    .whatsapp-api-privacy-wrapper h1 {
+      font-size: 1.4em !important;
+    }
+    .whatsapp-api-privacy-wrapper h2 {
+      font-size: 1.2em !important;
+    }
+    .whatsapp-api-privacy-wrapper .alert-box,
+    .whatsapp-api-privacy-wrapper .info-box,
+    .whatsapp-api-privacy-wrapper .success-box {
+      padding: 15px !important;
+    }
+  }
+</style>
+
+<div class="whatsapp-api-privacy-wrapper">
+  <div class="privacy-policy-container">
+    <h1 id="top">💬 Política de Privacidad - Módulo WhatsApp para Dolibarr</h1>
+
+    <!-- Tabla de Contenidos -->
+    <div class="toc">
+      <h3>📑 Índice de Contenidos</h3>
+      <ul>
+        <li><a href="#seccion-1">1. Información de la Empresa</a></li>
+        <li><a href="#seccion-2">2. Introducción y Principios</a></li>
+        <li><a href="#seccion-3">3. Datos Procesados</a></li>
+        <li><a href="#seccion-4">4. Lo Que Almacena el Módulo</a></li>
+        <li><a href="#seccion-5">5. Finalidad del Tratamiento</a></li>
+        <li><a href="#seccion-6">6. Base Legal</a></li>
+        <li><a href="#seccion-7">7. Medidas de Seguridad</a></li>
+        <li><a href="#seccion-8">8. Retención de Datos</a></li>
+        <li><a href="#seccion-9">9. Derechos de los Interesados</a></li>
+        <li><a href="#seccion-10">10. Contacto</a></li>
+      </ul>
+    </div>
+
+    <div class="header-info">
+      <h2>🏢 Información del Desarrollador</h2>
+      <p><strong>Módulo:</strong> WhatsApp Integration for Dolibarr</p>
+      <p><strong>Desarrollador:</strong> EasySoft Tech S.L.</p>
+      <p><strong>CIF/Tax ID:</strong> B16885766</p>
+      <p><strong>Dirección:</strong> Calle Gil de Jaz, Núm. 4 - Planta 1, Puerta N, 33201 Oviedo, Asturias, España</p>
+      <p><strong>Email de Contacto:</strong> <a href="mailto:info@easysoft.es">info@easysoft.es</a></p>
+      <p><strong>Web:</strong> <a href="https://www.easysoft.es" target="_blank" rel="noopener">https://www.easysoft.es</a></p>
+      <p><strong>Licencia:</strong> GNU GPLv3</p>
+      <p><strong>Repositorio:</strong> <a href="https://github.com/EasySoft-Tech-SL/dolibarr-whatsapp-module" target="_blank" rel="noopener">GitHub</a></p>
+    </div>
+
+    <div class="alert-box">
+      <strong>⚠️ POLÍTICA DE TRANSPARENCIA TOTAL</strong>
+      <p>Este documento establece la política de privacidad del <span class="highlight">Módulo WhatsApp para Dolibarr</span>. Como usuario del módulo, <strong>usted es el responsable del tratamiento</strong> de los datos que almacena en su sistema Dolibarr. Los datos NO se envían a servidores de EasySoft Tech S.L., permanecen en su instalación local.</p>
+    </div>
+
+    <hr />
+
+    <!-- SECCIÓN 1 -->
+    <div id="seccion-1" class="section">
+      <h2>1. Información de la Empresa</h2>
+      <p>
+        El <strong>Módulo WhatsApp para Dolibarr</strong> es un software de código abierto 
+        desarrollado por <strong>EasySoft Tech S.L.</strong>, empresa registrada en España 
+        con CIF <strong>B16885766</strong>.
+      </p>
+      <p>
+        Este módulo es una extensión para Dolibarr ERP/CRM que permite enviar y recibir 
+        mensajes de WhatsApp directamente desde su sistema, integrando las comunicaciones 
+        con terceros, facturas, pedidos y otros elementos de Dolibarr.
+      </p>
+      <div class="info-box">
+        <strong>⚠️ IMPORTANTE: Responsabilidad de Datos</strong>
+        <p><strong>EasySoft Tech S.L.</strong> es el desarrollador del módulo de software. Como usuario del módulo:</p>
+        <ul>
+          <li><strong>Usted es el responsable del tratamiento</strong> de los datos almacenados en su instalación de Dolibarr</li>
+          <li>Los datos se almacenan en <strong>su servidor</strong>, no en servidores de EasySoft Tech S.L.</li>
+          <li>EasySoft Tech S.L. <strong>no tiene acceso</strong> a los datos procesados por su instalación del módulo</li>
+          <li>La conexión a servicios de API de WhatsApp es <strong>directa entre su sistema y el proveedor de API</strong></li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- SECCIÓN 2 -->
+    <div id="seccion-2" class="section">
+      <h2>2. Introducción y Principios de Privacidad</h2>
+      <p>
+        El <strong>Módulo WhatsApp para Dolibarr</strong> es una integración local que funciona 
+        en su instalación de Dolibarr. Los principios de privacidad son:
+      </p>
+      <ul>
+        <li>
+          <strong>Transparencia:</strong> Información clara sobre qué datos se procesan y dónde se almacenan
+        </li>
+        <li>
+          <strong>Control del Usuario:</strong> Usted gestiona la retención y eliminación de datos
+        </li>
+        <li>
+          <strong>Minimización:</strong> Solo se procesan datos necesarios para el funcionamiento
+        </li>
+        <li>
+          <strong>Seguridad:</strong> Comunicaciones cifradas mediante HTTPS/TLS
+        </li>
+        <li>
+          <strong>Cumplimiento:</strong> Normativa RGPD, LOPDGDD y legislación aplicable
+        </li>
+      </ul>
+      
+      <h3>🔍 Responsabilidades</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Responsable</th>Módulo</h2>
+      <p>
+        El módulo WhatsApp para Dolibarr procesa y almacena los siguientes datos:
+      </p>
+      
+      <h3>📊 Datos Enviados a la API de WhatsApp</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Dato</th>
+            <th>Descripción</th>
+            <th>Finalidad</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>API Key</strong></td>
+            <td>Token de autenticación de tu cuenta WhatsApp API</td>
+            <td>Autenticación y autorización</td>
+          </tr>
+          <tr>
+            <td><strong>Número de Teléfono Destinatario</strong></td>
+            <td>Número WhatsApp al que se envía el mensaje</td>
+            <td>Enrutamiento de mensajes</td>
+          </tr>
+          <tr>
+            <td><strong>Contenido del Mensaje</strong></td>
+            <td>Texto, audio o documentos enviados</td>
+            <td>Comunicación con clientes</td>
+          </tr>
+          <tr>
+            <td><strong>Nombre de Archivo</strong></td>
+            <td>Nombre de documentos/medios adjuntos</td>
+            <td>Identificación de archivos enviados</td>
+          </tr>
+          <tr>
+            <td><strong>Tipo de Medio</strong></td>
+            <td>Tipo de archivo (document, image, video)</td>
+            <td>Procesamiento correcto del medio</td>
+          </tr>
+          <tr>
+            <td><strong>Dirección IP</strong></td>
+            <td>IP desde la que se realiza la petición</td>
+            <td>Seguridad y prevención de fraude</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>💾 Datos Almacenados en su Sistema Dolibarr</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Dato</th>
+            <th>Ubicación</th>
+            <th>Descripción</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Contenido de Mensajes</strong></td>
+            <td>Tabla actioncomm (Agenda)</td>
+            <td>Mensajes enviados y recibidos por WhatsApp</td>
+          </tr>
+          <tr>
+            <td><strong>Datos de Webhook</strong></td>
+            <td>Tabla webhooklog</td>
+            <td>Payload completo de eventos de WhatsApp</td>
+          </tr>
+          <tr>
+            <td><strong>Metadatos de Mensaje</strong></td>
+            <td>Tabla actioncomm</td>
+            <td>Fecha, hora, usuario, elemento relacionado</td>
+          </tr>
+          <tr>
+            <td><strong>Información de Instancia</strong></td>
+            <td>Tabla actioncomm/webhooklog</td>
+            <td>Nombre de la instancia de WhatsApp utilizada</td>
+          </tr>
+          <tr>
+            <td><strong>API Keys</strong></td>
+            <td>Configuración de usuario/global</td>
+            <td>Tokens de autenticación para la API</td>
+          </tr>
+          <tr>
+            <td><strong>Números de Teléfono</strong></td>
+            <td>Ficha de terceros</td>
+            <td>Números de WhatsApp de clientes</td>
+          </tr>Almacena el Módulo</h2>
+      <div class="success-box">
+        <strong>✅ Datos Almacenados en Dolibarr</strong>
+        <p>
+          El módulo WhatsApp para Dolibarr almacena <strong>localmente en su instalación</strong> los siguientes datos:
+        </p>
+      </div>
+
+      <h3>📝 Mensajes de WhatsApp</h3>
+      <ul>
+        <li><span style="color: green;">✓</span> Texto completo de mensajes enviados</li>
+        <li><span style="color: green;">✓</span> Texto completo de mensajes recibidos</li>
+        <li><span style="color: green;">✓</span> Transcripciones de mensajes de voz</li>
+        <li><span style="color: green;">✓</span> Nombres de archivos adjuntos (PDFs, imágenes, videos)</li>
+        <li><span style="color: green;">✓</span> Metadatos: fecha, hora, usuario, elemento relacionado</li>
+        <li><span style="color: green;">✓</span> Estado de envío/recepción</li>
+      </ul>
+
+      <h3>🔔 Webhooks Recibidos</h3>
+      <ul>
+        <li><span style="color: green;">✓</span> Eventos completos de WhatsApp (payload JSON completo)</li>
+        <li><span style="color: green;">✓</span> Tipo de evento (mensaje recibido, mensaje enviado, etc.)</li>
+        <li><span style="color: green;">✓</span> Nombre de instancia de WhatsApp</li>
+        <li><span style="color: green;">✓</span> Remitente y destinatario</li>
+        <li><span style="color: green;">✓</span> Timestamp del evento</li>
+      </ul>
+
+      <h3>⚙️ Configuración</h3>
+      <ul>
+        <li><span style="color: green;">✓</span> URL del servidor API de WhatsApp</li>
+        <li><span style="color: green;">✓</span> API Keys de autenticación</li>
+        <li><span style="color: green;">✓</span> Números de teléfono de clientes (en fichas de terceros)</li>
+        <li><span style="color: green;">✓</span> Preferencias de envío</li>
+      </ul>
+
+      <div class="alert-box">
+        <strong>⚠️ IMPORTANTE</strong>
+        <p>
+          <strong>Todos estos datos se almacenan únicamente en su instalación local de Dolibarr.</strong>
+          EasySoft Tech S.L. NO tiene acceso a estos datos almacenados en su sistema.
+          Usted mantiene control total sobre estos datos y su retenciónQUE NO RECOPILAMOS</strong>
+        <p>
+          Queremos ser completamente claros: <strong>el contenido de los mensajes de WhatsApp NO es almacenado</strong>
+          en ningún servidor de WhatsApp API Service. Bajo ninguna circunstancia recopilamos:
+        </p>
+      </div>
+
+      <h3>❌ Contenido de Mensajes</h3>
+      <ul>
+        <li><span style="color: red;">✗</span> Texto de los mensajes enviados o recibidos</li>
+        <li><span style="color: red;">✗</span> Imágenes, vídeos, documentos o cualquier archivo adjunto</li>
+        <li><span style="color: red;">✗</span> Mensajes de voz o transcripciones de audio</li>
+        <li><span style="color: red;">✗</span> Datos de ubicación dentro de mensajes</li>
+        <li><span style="color: red;">✗</span> Información de contactos o grupos</li>
+      </ul>
+procesados por el módulo WhatsApp se utilizan para:
+      </p>
+
+      <h3>1. Funcionalidad del Módulo</h3>
+      <ul>
+        <li>Envío y recepción de mensajes de WhatsApp desde Dolibarr</li>
+        <li>Integración de comunicaciones con terceros, facturas, pedidos, etc.</li>
+        <li>Registro de historial de comunicaciones en la agenda</li>
+        <li>Seguimiento de conversaciones con clientes</li>
+      </ul>
+
+      <h3>2. Prestación del Servicio de Mensajería</h3>
+      <ul>
+        <li>Enrutamiento y entrega de mensajes a través de WhatsApp</li>
+        <li>Autenticación y autorización de peticiones</li>
+        <li>Confirmación de entrega de mensajes</li>
+      </ul>
+
+      <h3>3. Auditoría y Trazabilidad</h3>
+      <ul>
+        <li>Registro de eventos de webhook para debugging</li>
+        <li>Historial de comunicaciones con clientes</li>
+        <li>Cumplimiento de obligaciones de trazabilidad empresarial</li>
+      </ul>
+
+      <h3>4. Seguridad</h3>
+      <ul>
+        <li>Prevención de fraude y accesos no autorizados</li>
+        <li>Detección de anomalías en el uso del servicio</li>
+        <li>Control de acceso mediante API Keys</li>
+      </ul>
+
+      <h3>🚫 Lo Que NO Se Hace con los Datos</h3>
+      <ul>
+        <li><span style="color: red;">✗</span> Marketing o publicidad no solicitada</li>
+        <li><span style="color: red;">✗</span> Venta de datos a terceros</li>
+        <li><span style="color: red;">✗</span> Compartir datos sin su consentimiento</li>
+        <li><span style="color: red;">✗</span> Crear perfiles de comportamiento para otros fines</li>
+        <li><span style="color: red;">✗</span> Combinar datos con fuentes externas sin autorización</li>
+        <li><span style="color: red;">✗</span> Transferencia fuera de su instalación de Dolibarr (salvo API de WhatsApp para envío)</li>
+      </ul>
+
+      <div class="info-box">
+        <strong>📍 Ubicación de los Datos</strong>
+        <p>Los mensajes y datos de comunicación se almacenan <strong>únicamente en su servidor de Dolibarr</strong>, bajo su control y responsabilidad. EasySoft Tech S.L. solo procesa los datos en tránsito necesarios para la entrega de mensajes a través de la API de WhatsApp.</p>
+      </div class="alert-box">
+        <strong>⚠️ IMPORTANTE</strong>
+        <p>
+          Si bien procesamos el <strong>número de teléfono destinatario</strong> (necesario para enrutar el mensaje),
+          NUNCA almacenamos el contenido del mensaje en sí. El contenido se procesa únicamente en tránsito para su entrega
+          a través de WhatsApp Business API.
+        </p>
+      </div>
+    </div>
+
+    <!-- SECCIÓN 5 -->
+    <div id="seccion-5" class="section">
+      <h2>5. Finalidad del Tratamiento de Datos</h2>
+      <p>
+        Los datos técnicos que procesamos se utilizan <strong>exclusivamente</strong> para:
+      </p>
+      <ul>
+        <li>
+          <strong>Prestación del Servicio:</strong> Enrutamiento y entrega de mensajes a través de WhatsApp
+        </li>
+        <li>
+          <strong>Autenticación y Autorización:</strong> Validación de credenciales y control de acceso
+        </li>
+        <li>
+          <strong>Cumplimiento Normativo:</strong> Cumplir con obligaciones legales y regulatorias
+        </li>
+        <li>
+          <strong>Seguridad:</strong> Prevención de fraude, detección de anomalías y accesos no autorizados
+        </li>
+      
+      <div class="alert-box">
+        <strong>⚠️ Responsable del Tratamiento</strong>
+        <p>Como usuario del módulo WhatsApp para Dolibarr, <strong>usted es el responsable del tratamiento</strong> de los datos personales almacenados en su sistema.</p>
+      </div>
+
+      <h3>⚖️ Bases Legales Aplicables</h3>
+      <p>El tratamiento de datos que usted realiza mediante este módulo puede fundamentarse en:</p>
+
+      <h4>1. Consentimiento del Interesado (Art. 6.1.a RGPD)</h4>
+      <p>
+        Si obtiene consentimiento de sus clientes para enviarles comunicaciones por WhatsApp.
+      </p>
+
+      <h4>2. Ejecución de Contrato (Art. 6.1.b RGPD)</h4>
+      <p>
+        Si el envío de mensajes es necesario para la ejecución de un contrato con el cliente 
+        (ej: notificaciones de pedidos, facturas).
+      </p>
+
+      <h4>3. Interés Legítimo (Art. 6.1.f RGPD)</h4>
+      <p>
+        Si tiene un interés legítimo en comunicarse con clientes existentes, siempre que 
+        prevalezca sobre los derechos del interesado.
+      </p>
+
+      <h4>4. Obligación Legal (Art. 6.1.c RGPD)</h4>
+      <p>
+        Si está obligado legalmente a conservar registros de comunicaciones.
+      </p>
+
+      <h3>🛡️ Responsabilidades del Usuario</h3>
+      <p>Como responsable del tratamiento, debe:</p>
+      <ul>
+        <li><span style="color: green;">✓</span> Obtener bases legales adecuadas para el tratamiento</li>
+        <li><span style="color: green;">✓</span> Informar a los interesados sobre el tratamiento de sus datos</li>
+        <li><span style="color: green;">✓</span> Garantizar los derechos de los interesados (acceso, rectificación, supresión, etc.)</li>
+        <li><span style="color: green;">✓</span> Implementar medidas de seguridad adecuadas</li>
+        <li><span style="color: green;">✓</span> Cumplir con el RGPD y legislación aplicable</li>
+        <li><span style="color: green;">✓</span> Mantener registro de actividades de tratamiento</li>
+        <li><span style="color: green;">✓</span> Realizar evaluaciones de impacto si es necesario</li>
+      </ul>
+
+      <h3>👨‍💼 Rol de EasySoft Tech S.L.</h3>
+      <p>EasySoft Tech S.L. actúa como:</p>
+      <ul>
+        <li><strong>Desarrollador de software:</strong> Crea y mantiene el módulo</li>
+        <li><strong>NO es encargado del tratamiento:</strong> No tiene acceso a sus datos</li>
+        <li><strong>NO es responsable del tratamiento:</strong> Usted controla completamente los datos</li>
+      </ull contratar nuestro servicio, usted acepta explícitamente el tratamiento de datos técnicos
+        descrito en esta política.
+      </p>
+      <h3>⚖️ Ejecución de Contrato (Art. 6.1.b RGPD)</h3>
+      <p>
+        El procesamiento de datos es necesario para la prestación del servicio que ha contratado.
+      </p>
+      <h3>📋 Obligación Legal (Art. 6.1.c RGPD)</h3>
+      <p>
+        Algunos datos se procesan para cumplir con obligaciones legales, como la lucha contra
+        el fraude y el blanqueo de capitales (AML/KYC).
+      </p>
+      <h3>🛡️ Interés Legítimo (Art. 6.1.f RGPD)</h3>
+      <p>
+        Procesamos datos para garantizar la seguridad de la plataforma y prevenir abusos del servicio.
+      </p>
+    </div>
+
+    <!-- SECCIÓN 7 -->
+    <div id="seccion-7" class="section">
+      <h2>7. Medidas de Seguridad</h2>
+      
+      <h3>🔐 Seguridad del Módulo</h3>
+      <p>El módulo WhatsApp para Dolibarr implementa las siguientes medidas de seguridad:</p>
+
+      <h4>Cifrado de Comunicaciones</h4>
+      <ul>
+        <li><strong>HTTPS/TLS 1.2+:</strong> Todas las comunicaciones con el servicio de mensajería se cifran</li>
+        <li><strong>API Key en Headers:</strong> Las claves de autenticación se transmiten de forma segura</li>
+        <li><strong>Validación de Certificados SSL:</strong> Verificación de certificados en conexiones</li>
+      </ul>
+
+      <h4>Almacenamiento Seguro</h4>
+      <ul>
+        <li><strong>Hashing de Credenciales:</strong> Opcionalmente puede almacenar credenciales hasheadas</li>
+        <li><strong>Permisos de Dolibarr:</strong> Control de acceso basado en permisos de usuario</li>
+        <li><strong>Segregación de Datos:</strong> Los datos están aislados por entidad en Dolibarr multiempresa</li>
+      </ul>
+
+      <h4>Validación de Datos</h4>
+      <ul>
+        <li><strong>Sanitización de Inputs:</strong> Limpieza de datos de entrada</li>
+        <li><strong>Prepared Statements:</strong> Uso de consultas parametrizadas para prevenir SQL injection</li>
+        <li><strong>Validación de Webhooks:</strong> Verificación de webhooks entrantes</li>
+      </ul>
+
+      <h3>🛡️ Responsabilidades de Seguridad</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Responsable</th>
+            <th>Ámbito de Seguridad</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Usuario (Usted)</strong></td>
+            <td>- Seguridad del servidor Dolibarr<br>- Copias de seguridad<br>- Control de acceso a Dolibarr<br>- Actualizaciones del sistema<br>- Protección de credenciales</td>
+          </tr>
+          <tr>
+            <td><strong>Proveedor de Servicios WhatsApp</strong></td>
+            <td>- Seguridad del servicio de mensajería<br>- Entrega de mensajes<br>- Cifrado end-to-end de WhatsApp</td>
+          </tr>
+          <tr>
+            <td><strong>EasySoft Tech S.L.</strong></td>
+            <td>- Código seguro del módulo<br>- Corrección de vulnerabilidades<br>- Actualizaciones de seguridad</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>🔍 Recomendaciones de Seguridad</h3>
+      <p>Para maximizar la seguridad al usar el módulo:</p>
+      <ol>
+        <li><strong>Mantenga Dolibarr actualizado</strong> a la última versión estable</li>
+        <li><strong>Use HTTPS</strong> en su instalación de Dolibarr</li>
+        <li><strong>Proteja sus credenciales</strong> - no las comparta ni las almacene en código</li>
+        <li><strong>Realice copias de seguridad</strong> regulares de su base de datos</li>
+        <li><strong>Limite permisos</strong> de usuarios al módulo según necesidad</li>
+        <li><strong>Revise logs</strong> de webhook regularmente para detectar anomalías</li>
+        <li><strong>Use contraseñas fuertes</strong> para cuentas de Dolibarr</li>
+        <li><strong>Active autenticación de dos factores</strong> si está disponible</li>
+        <li><strong>Mantenga el módulo actualizado</strong> a la última versión</li>
+      </ol>
+
+      <div class="info-box">
+        <strong>🚨 Reporte de Vulnerabilidades</strong>
+        <p>Si encuentra una vulnerabilidad de seguridad en el módulo:</p>
+        <ul>
+          <li>📧 Contacte: info@easysoft.es</li>
+          <li>🔒 Proporcione detalles técnicos de forma confidencial</li>
+          <li>⏱️ Recibirá respuesta en 48-72 horas</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- SECCIÓN 8 -->
+    <div id="seccion-8" class="section">
+      <h2>8. Retención de Datos</h2>
+      
+      <h3>📋 Datos en su Sistema Dolibarr</h3>
+      <p><strong>Usted controla la retención de datos</strong> almacenados en su instalación de Dolibarr:</p>
+
+      <h4>Mensajes en Agenda (actioncomm)</h4>
+      <ul>
+        <li><strong>Retención:</strong> Según su configuración de Dolibarr</li>
+        <li><strong>Control:</strong> Puede eliminar manualmente desde la agenda</li>
+        <li><strong>Ubicación:</strong> Base de datos local de Dolibarr</li>
+      </ul>
+
+      <h4>Logs de Webhook (webhooklog)</h4>
+      <ul>
+        <li><strong>Retención:</strong> Según su configuración del módulo</li>
+        <li><strong>Control:</strong> Puede limpiar o eliminar desde el módulo</li>
+        <li><strong>Ubicación:</strong> Base de datos local de Dolibarr</li>
+        <li><strong>Recomendación:</strong> Limpieza periódica (ej: cada 90 días)</li>
+      </ul>
+
+      <h4>Archivos Adjuntos</h4>
+      <ul>
+        <li><strong>Retención:</strong> Los archivos PDF/imágenes enviados se convierten a base64 y se transmiten</li>
+        <li><strong>Almacenamiento:</strong> No se almacenan copias adicionales, están en el sistema de documentos de Dolibarr</li>
+        <li><strong>Control:</strong> Gestión a través del sistema de documentos de Dolibarr</li>
+      </ul>
+
+      <h3>📋 Datos en Servidores del Proveedor de Servicios</h3>
+      <p>Los datos procesados por el servicio de mensajería WhatsApp (gestionado por el proveedor externo) siguen sus propias políticas de retención. Consulte la documentación de su proveedor de servicios de mensajería.</p>
+
+      <h3>🗑️ Eliminación de Datos</h3>
+      <p>Para eliminar datos del módulo:</p>
+      <ol>
+        <li><strong>Mensajes de Agenda:</strong> Acceda a la agenda de Dolibarr y elimine eventos de tipo WhatsApp manualmente</li>
+        <li><strong>Logs de Webhook:</strong> Acceda al módulo WhatsApp > Webhook Logs y elimine registros individualmente o en masa</li>
+        <li><strong>Configuración y Credenciales:</strong> Acceda a Setup del módulo y elimine o modifique credenciales según necesite</li>
+        <li><strong>Desinstalación Completa:</strong> La desactivación del módulo preserva los datos. La desinstalación completa puede eliminar tablas (según configuración)</li>
+      </ol>
+    </div>
+
+    <!-- SECCIÓN 9 -->
+    <div id="seccion-9" class="section">
+      <h2>9. Derechos del Usuario</h2>
+      <p>
+        Conforme al Reglamento General de Protección de Datos (RGPD) y la Ley Orgánica de Protección
+        de Datos Personales (LOPDGDD), usted tiene los siguientes derechos:
+      </p>
+
+      <h3>🔍 Derecho de Acceso</h3>
+      <p>
+        Puede solicitar una copia de los datos personales que procesamos sobre usted. Proporcionaremos
+        esta información en un formato estructurado, legible y de uso común en un plazo de 30 días.
+      </p>
+
+      <h3>✏️ Derecho de Rectificación</h3>
+      <p>
+        Si los datos son inexactos o incompletos, puede solicitar su corrección o actualización.
+      </p>
+
+      <h3>🗑️ Derecho de Supresión ("Derecho al Olvido")</h3>
+      <p>
+        Puede solicitar la eliminación de sus datos cuando:
+      </p>
+      <ul>
+        <li>Los datos ya no sean necesarios para la finalidad original</li>
+        <li>Retire su consentimiento (si fue el fundamento legal)</li>
+        <li>Se oponga al procesamiento</li>
+        <li>Los datos hayan sido procesados ilícitamente</li>
+      </ul>
+      <p>
+        <strong>Excepción:</strong> No podemos eliminar datos si existe obligación legal de conservarlos
+        (ej: datos fiscales, registros de fraude).
+      </p>
+
+      <h3>⛔ Derecho de Limitación del Procesamiento</h3>
+      <p>
+        Puede solicitar que limitemos el procesamiento de sus datos mientras resolvemos una disputa
+        sobre su exactitud o legalidad.
+      </p>
+
+      <h3>🔄 Derecho de Portabilidad</h3>
+      <p>
+        Puede solicitar recibir sus datos en un formato estructurado, comúnmente utilizado y legible
+        por máquina (CSV, JSON, etc.) para transferirlos a otro proveedor.
+      </p>
+
+      <h3>📢 Derecho de Oposición</h3>
+      <p>
+        Puede oponerse al procesamiento de sus datos para marketing directo o basado en interés legítimo.
+        Sin embargo, esto puede afectar a la prestación del servicio.
+      </p>
+
+      <h3>📋 Derechos Relacionados con Decisiones Automatizadas</h3>
+      <p>
+        Si realizamos decisiones basadas en perfilado automatizado que le afecten legalmente,
+        tiene derecho a:
+      </p>
+      <ul>
+        <li>Obtener una explicación de la decisión</li>
+        <li>Expresar su punto de vista</li>
+        <li>Impugnar la decisión ante un humano</li>
+      </ul>
+
+      <h3>📞 Cómo Ejercer Sus Derechos</h3>
+      <p>
+        Para ejercer cualquiera de estos derechos, envíe una solicitud a:
+      </p>
+      <ul>
+        <li>
+          <strong>Email:</strong> <a href="mailto:info@easysoft.es">info@easysoft.es</a>
+        </li>
+        <li>
+          <strong>Dirección Postal:</strong> Calle Gil de Jaz, Núm. 4 - Planta 1, Puerta N, 33201 Oviedo, Asturias
+        </li>
+      </ul>
+      <p>
+        Procesaremos su solicitud en un plazo de <strong>30 días calendario</strong>. Si es necesaria
+        información adicional, le lo comunicaremos.
+      </p>
+    </div>
+
+    <!-- SECCIÓN 10 -->
+    <div id="seccion-10" class="section">
+      <h2>10. Contacto y Autoridad Supervisora</h2>
+      
+      <h3>📧 Contacto para Cuestiones sobre el Módulo</h3>
+      <p>
+        <strong>EasySoft Tech S.L. - Soporte del Módulo</strong>
+      </p>
+      <ul>
+        <li><strong>Email:</strong> <a href="mailto:info@easysoft.es">info@easysoft.es</a></li>
+        <li><strong>Dirección:</strong> Calle Gil de Jaz, Núm. 4 - Planta 1, Puerta N, 33201 Oviedo, Asturias, España</li>
+        <li><strong>CIF:</strong> B16885766</li>
+        <li><strong>Web:</strong> <a href="https://www.easysoft.es" target="_blank" rel="noopener">www.easysoft.es</a></li>
+        <li><strong>GitHub:</strong> <a href="https://github.com/EasySoft-Tech-SL/dolibarr-whatsapp-module" target="_blank" rel="noopener">github.com/EasySoft-Tech-SL/dolibarr-whatsapp-module</a></li>
+      </ul>
+
+      <div class="important-box" style="margin-top: 20px;">
+        <h4>⚠️ Importante: Consultas sobre Datos Personales</h4>
+        <p><strong>Para ejercer derechos sobre datos personales</strong> (acceso, rectificación, supresión, etc.):</p>
+        <ul>
+          <li>Si usted es <strong>cliente</strong> de una empresa que usa este módulo → Contacte con esa empresa, no con EasySoft</li>
+          <li>Si usted es <strong>usuario</strong> del módulo → Gestione los derechos de sus clientes directamente en Dolibarr</li>
+        </ul>
+        <p>EasySoft Tech S.L. <strong>no almacena ni accede</strong> a los datos personales procesados por el módulo en su instalación.</p>
+      </div>
+
+      <h3>⚖️ Autoridad Supervisora</h3>
+      <p>
+        Si considera que el tratamiento de sus datos viola el RGPD o la LOPDGDD,
+        puede presentar una reclamación ante la autoridad supervisora competente:
+      </p>
+      <ul>
+        <li>
+          <strong>Autoridad Principal (España):</strong> Agencia Española de Protección de Datos (AEPD)
+          <ul>
+            <li>Web: <a href="https://www.aepd.es" target="_blank" rel="noopener">www.aepd.es</a></li>
+            <li>Email: <a href="mailto:info@aepd.es">info@aepd.es</a></li>
+          </ul>
+        </li>
+      </ul>
+
+      <h3>🔄 Cambios en la Política</h3>
+      <p>
+        Nos reservamos el derecho de actualizar esta política cuando sea necesario. Los cambios
+        sustanciales se comunicarán mediante:
+      </p>
+      <ul>
+        <li>Notificación por email a la dirección registrada</li>
+        <li>Publicación en nuestro sitio web</li>
+        <li>Banner informativo en el panel de administración del servicio</li>
+      </ul>
+      <p>
+        El uso continuado del servicio tras los cambios implica la aceptación de la política actualizada.
+      </p>
+    </div>
+
+    <hr />
+
+    <div class="footer-note">
+      <strong>Política de Privacidad - WhatsApp API Service</strong><br />
+      Desarrollado por <strong>EasySoft Tech S.L.</strong> (CIF: B16885766)<br />
+      <strong>Versión:</strong> 1.0<br />
+      <strong>Fecha de Vigencia:</strong> 15 de diciembre de 2025<br />
+      <strong>Última Actualización:</strong> 15/12/2025
+    </div>
+  </div>
+</div>
