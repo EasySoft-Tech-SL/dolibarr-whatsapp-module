@@ -72,7 +72,7 @@ class modWhatsapp extends DolibarrModules
 		$this->editor_url = 'https://www.easysoft.es';
 
 		// Possible values for version are: 'development', 'experimental', 'dolibarr', 'dolibarr_deprecated' or a version string like 'x.y.z'
-		$this->version = '1.2';
+		$this->version = '1.3';
 		// Url to the file with your last numberversion of this module
 		//$this->url_last_version = 'http://www.example.com/versionmodule.txt';
 
@@ -720,6 +720,7 @@ class modWhatsapp extends DolibarrModules
 			'whatsapp@whatsapp',
 			'$conf->whatsapp->enabled'
 		);
+		$rang = $rang + 5;
 		$result3 = $extrafields->addExtraField(
 			'whatsapp_message_sent',
 			"WHATSAPP_MESSAGE_SENT_ON_TIME",
@@ -733,16 +734,36 @@ class modWhatsapp extends DolibarrModules
 			'',
 			1,
 			'$user->rights->whatsapp->read',
-			5,
+			1,
 			'WHATSAPP_MESSAGE_SENT_ON_TIMETooltip',
 			'',
 			'',
 			'whatsapp@whatsapp',
 			'$conf->whatsapp->enabled'
 		);
+		$rang = $rang + 5;
 
+		$result4 = $extrafields->addExtraField(
+			'whatsapp_notification_datetime',
+			"WHATSAPP_NOTIFICATION_DATETIME",
+			'datetime',
+			$rang,
+			250,
+			'actioncomm',
+			0,
+			0,
+			'',
+			'',
+			1,
+			'$user->rights->whatsapp->read',
+			1,
+			'WHATSAPP_NOTIFICATION_DATETIMETooltip',
+			'',
+			'',
+			'whatsapp@whatsapp',
+			'$conf->whatsapp->enabled'
+		);
 
-		//$result4=$extrafields->addExtraField('whatsapp_myattr4', "New Attr 4 label", 'select',  1,  3, 'thirdparty',   0, 1, '', array('options'=>array('code1'=>'Val1','code2'=>'Val2','code3'=>'Val3')), 1,'', 0, 0, '', '', 'whatsapp@whatsapp', '$conf->whatsapp->enabled');
 		//$result5=$extrafields->addExtraField('whatsapp_myattr5', "New Attr 5 label", 'text',    1, 10, 'user',         0, 0, '', '', 1, '', 0, 0, '', '', 'whatsapp@whatsapp', '$conf->whatsapp->enabled');
 
 		// Permissions

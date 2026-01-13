@@ -56,7 +56,8 @@ class WhatsappUtils extends CommonObject
 		$sql .= " LEFT JOIN " . MAIN_DB_PREFIX . "actioncomm_extrafields ace ON ace.fk_object=ac.id ";
 		$sql .= " WHERE ac.code = 'AC_SEND_WHATSAPP_NOTIFY'";
 		$sql .= " AND (ace.whatsapp_message_sent IS NULL OR ace.whatsapp_message_sent = 0)";
-		$sql .= " AND ac.datep <= '" . $this->db->idate($now) . "'";
+		$sql .= " AND ace.whatsapp_notification_datetime IS NOT NULL";
+		$sql .= " AND ace.whatsapp_notification_datetime <= '" . $this->db->idate($now) . "'";
 		$sql .= " AND ac.entity IN (" . getEntity('actioncomm') . ")";
 
 		$resql = $this->db->query($sql);
