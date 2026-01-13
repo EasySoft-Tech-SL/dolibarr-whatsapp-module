@@ -1,58 +1,82 @@
 # CHANGELOG WHATSAPP FOR [DOLIBARR ERP CRM](https://www.dolibarr.org)
 
-## 1.3 - 2026-01-13
+## [1.3] - 2026-01-13
 
-### Added
-- New `whatsapp_notification_datetime` extrafield for ActionComm to schedule WhatsApp notifications
-- Translations for notification datetime field in all supported languages (EN, ES, DE, FR, IT, PT)
+### ✨ Nueva Funcionalidad: Programación de Notificaciones WhatsApp
+- **📅 Nuevo campo `whatsapp_notification_datetime`**: Extrafield para ActionComm que permite programar envíos de WhatsApp
+  - Permite definir fecha y hora exacta para el envío de notificaciones
+  - Integración con el sistema de eventos de Dolibarr
 
-### Changed
-- WhatsApp reminder cron job now uses `whatsapp_notification_datetime` instead of `datep` for more precise scheduling
-- Module version updated to 1.3
+### 🔧 Mejoras en el Cron Job de Recordatorios
+- **⚡ Optimización de la consulta SQL**: El cron job ahora usa `whatsapp_notification_datetime` en lugar de `datep`
+  - Programación más precisa de los recordatorios
+  - Verificación de valores nulos para evitar envíos incorrectos
 
-### Fixed
-- SQL syntax error in `data.sql` - missing semicolon before last INSERT statement
-- Tooltip spacing inconsistency in `WHATSAPP_MESSAGE_SENT_ON_TIMETooltip` across all language files
+### 🐛 Correcciones
+- **✅ Error SQL en `data.sql`**: Corregido punto y coma faltante antes del último INSERT
+- **✅ Espaciado en tooltips**: Corregida inconsistencia en `WHATSAPP_MESSAGE_SENT_ON_TIMETooltip` en todos los archivos de idioma
 
-### Technical Improvements
-- Enhanced cron job query to check for null notification datetime values
-- Improved scheduling logic for WhatsApp reminders
+### 🌐 Traducciones
+- **📋 Nuevas traducciones añadidas** (EN, ES, DE, FR, IT, PT):
+  - `WHATSAPP_NOTIFICATION_DATETIME`: Etiqueta del campo de fecha de notificación
+  - `WHATSAPP_NOTIFICATION_DATETIMETooltip`: Tooltip explicativo del campo
 
-## 1.1 - 2025-11-06
+### 📝 Archivos Modificados
+- `class/whatsapputils.class.php` - Actualización de la lógica del cron job
+- `core/modules/modWhatsapp.class.php` - Versión 1.3 y nuevo extrafield
+- `langs/de_DE/whatsapp.lang` - Nuevas traducciones en alemán
+- `langs/en_US/whatsapp.lang` - Nuevas traducciones en inglés
+- `langs/es_ES/whatsapp.lang` - Nuevas traducciones en español
+- `langs/fr_FR/whatsapp.lang` - Nuevas traducciones en francés
+- `langs/it_IT/whatsapp.lang` - Nuevas traducciones en italiano
+- `langs/pt_PT/whatsapp.lang` - Nuevas traducciones en portugués
+- `sql/data.sql` - Corrección de sintaxis SQL
 
-### Added
-- Premium glassmorphism design system for floating action button (FAB)
-- Advanced CSS animations with cubic-bezier easing functions
-- Multi-layer box-shadow effects for depth perception
-- Rotating glow effect on main button hover
-- Badge pulse animation with gradient backgrounds
-- Backdrop-filter with blur effects for modern UI
-- Elastic bounce animations for card interactions
-- Gradient borders and refined visual hierarchy
+---
 
-### Changed
-- Complete redesign of WhatsApp FAB with professional appearance
-- Improved hover interactions with smooth transitions
-- Enhanced visual feedback on user interactions
-- Optimized z-index layering for proper element stacking
-- Refined button sizing and spacing for better usability
-- Updated badge styling with more prominent appearance
-- Improved responsive design for mobile devices
+## [1.1] - 2025-11-06
 
-### Fixed
-- Z-index issues causing option cards to appear behind main button
-- Hover functionality conflicting with JavaScript toggle
-- CSS overflow clipping scaled elements on hover
-- Visual hierarchy problems in floating card stack
-- Transform animations affecting element positioning
+### ✨ Rediseño Premium del Botón Flotante (FAB)
+- **🎨 Sistema de diseño glassmorphism premium**: Efectos de cristal modernos
+- **🔄 Animaciones CSS avanzadas**: Funciones cubic-bezier para transiciones suaves
+- **✨ Efectos de sombra multicapa**: Percepción de profundidad mejorada
+- **🌟 Efecto de brillo rotativo**: Hover en el botón principal
+- **💫 Animación de pulso en badge**: Fondos con gradientes
+- **🔲 Backdrop-filter con blur**: UI moderna y elegante
+- **🎯 Animaciones elásticas**: Interacciones de tarjetas mejoradas
+- **🖼️ Bordes con gradiente**: Jerarquía visual refinada
 
-### Technical Improvements
-- Removed JavaScript toggle in favor of pure CSS :hover
-- Optimized animation performance with GPU acceleration
-- Enhanced cross-browser compatibility with -webkit- prefixes
-- Improved semantic structure of FAB container
-- Refined animation timing and delays for smoother UX
+### 🔧 Mejoras de Interfaz
+- **✅ Rediseño completo del FAB**: Apariencia profesional
+- **⚡ Interacciones hover mejoradas**: Transiciones suaves
+- **📊 Feedback visual optimizado**: Mejor respuesta a interacciones
+- **🔢 Capas z-index optimizadas**: Apilamiento correcto de elementos
+- **📏 Dimensiones y espaciado refinados**: Mayor usabilidad
+- **🏷️ Estilo de badge actualizado**: Apariencia más prominente
+- **📱 Diseño responsive mejorado**: Adaptación a dispositivos móviles
 
-## 1.0
+### 🐛 Correcciones
+- **✅ Problemas de z-index**: Tarjetas de opciones aparecían detrás del botón principal
+- **✅ Conflicto hover/JavaScript**: Funcionalidad hover corregida
+- **✅ Overflow CSS**: Elementos escalados se recortaban en hover
+- **✅ Jerarquía visual**: Problemas en la pila de tarjetas flotantes
+- **✅ Animaciones de transformación**: Posicionamiento de elementos corregido
 
-Initial version
+### 🔧 Mejoras Técnicas
+- **🚫 Eliminación de toggle JavaScript**: Ahora usa CSS :hover puro
+- **⚡ Rendimiento de animaciones**: Aceleración GPU optimizada
+- **🌐 Compatibilidad cross-browser**: Prefijos -webkit- añadidos
+- **📋 Estructura semántica**: Contenedor FAB mejorado
+- **⏱️ Timing de animaciones**: Delays refinados para UX más suave
+
+---
+
+## [1.0] - 2025-01-01
+
+### 🎉 Versión Inicial
+- **📱 Integración con WhatsApp API**: Envío de mensajes desde Dolibarr
+- **📝 Sistema de plantillas**: Gestión de mensajes predefinidos
+- **🔔 Webhook receiver**: Recepción de mensajes entrantes
+- **📊 Registro de webhook logs**: Historial de comunicaciones
+- **🎤 Texto a audio**: Conversión TTS para mensajes de voz
+- **🔗 Integración con terceros**: Envío desde fichas de clientes/contactos

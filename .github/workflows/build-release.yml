@@ -95,9 +95,14 @@ jobs:
         run: |
           VERSION="${{ steps.version.outputs.version }}"
           
-          # Extraer la sección del changelog para esta versión usando sed
-          # Captura desde "## VERSION" hasta el próximo "## " (siguiente versión)
-          CHANGELOG=$(sed -n "/^## ${VERSION}/,/^## /p" ChangeLog.md | sed '1d;$d')
+          # Extraer la sección del changelog para esta versión
+          # Soporta formato "## [X.X]" o "## [X.X.X]" con separador ---
+          CHANGELOG=$(sed -n "/^## \[${VERSION}\]/,/^---$/p" ChangeLog.md | sed '1d;$d')
+          
+          # Si no se encuentra con ---, intentar hasta la siguiente versión
+          if [ -z "$CHANGELOG" ]; then
+            CHANGELOG=$(sed -n "/^## \[${VERSION}\]/,/^## \[/p" ChangeLog.md | sed '1d;$d')
+          fi
           
           # Si no se encuentra changelog específico, usar mensaje por defecto
           if [ -z "$CHANGELOG" ]; then
@@ -105,7 +110,7 @@ jobs:
           fi
           
           # Debug: mostrar lo que se extrajo
-          echo "Extracted changelog:"
+          echo "Extracted changelog for version ${VERSION}:"
           echo "$CHANGELOG"
           
           # Guardar en variable de entorno usando heredoc para manejar multilinea
