@@ -90,6 +90,24 @@ jobs:
           echo "archive_name=$ARCHIVE_NAME" >> $GITHUB_OUTPUT
         id: archive
       
+      - name: Extract changelog for version
+        id: changelog
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+          
+          # Extraer la sección del changelog para esta versión
+          CHANGELOG=$(awk "/^## $VERSION /,/^## [0-9]/" ChangeLog.md | sed '$d' | tail -n +2)
+          
+          # Si no se encuentra changelog específico, usar mensaje por defecto
+          if [ -z "$CHANGELOG" ]; then
+            CHANGELOG="No changelog available for this version."
+          fi
+          
+          # Guardar en variable de entorno usando heredoc para manejar multilinea
+          echo "changelog<<EOF" >> $GITHUB_OUTPUT
+          echo "$CHANGELOG" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+      
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
@@ -114,13 +132,17 @@ jobs:
             2. Descomprimir en `custom/whatsapp/` de tu instalación de Dolibarr
             3. Activar el módulo desde el panel de administración
             
-            ### 📋 Cambios
-            Ver [ChangeLog.md](https://github.com/${{ github.repository }}/blob/main/ChangeLog.md) para detalles completos.
+            ### 📋 Cambios en esta versión
+            ${{ steps.changelog.outputs.changelog }}
             
-            ### ℹ️ Información
+            ### ℹ️ Información del Build
             - **Commit**: ${{ github.sha }}
             - **Branch**: ${{ github.ref_name }}
             - **Build Date**: ${{ github.event.head_commit.timestamp }}
+            
+            ---
+            
+            Ver [ChangeLog.md](https://github.com/${{ github.repository }}/blob/main/ChangeLog.md) completo para más detalles.
           files: module_whatsapp-${{ steps.version.outputs.version }}.zip
           draft: false
           prerelease: false

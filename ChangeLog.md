@@ -1,5 +1,23 @@
 # CHANGELOG WHATSAPP FOR [DOLIBARR ERP CRM](https://www.dolibarr.org)
 
+## 1.3 - 2026-01-13
+
+### Added
+- New `whatsapp_notification_datetime` extrafield for ActionComm to schedule WhatsApp notifications
+- Translations for notification datetime field in all supported languages (EN, ES, DE, FR, IT, PT)
+
+### Changed
+- WhatsApp reminder cron job now uses `whatsapp_notification_datetime` instead of `datep` for more precise scheduling
+- Module version updated to 1.3
+
+### Fixed
+- SQL syntax error in `data.sql` - missing semicolon before last INSERT statement
+- Tooltip spacing inconsistency in `WHATSAPP_MESSAGE_SENT_ON_TIMETooltip` across all language files
+
+### Technical Improvements
+- Enhanced cron job query to check for null notification datetime values
+- Improved scheduling logic for WhatsApp reminders
+
 ## 1.1 - 2025-11-06
 
 ### Added
