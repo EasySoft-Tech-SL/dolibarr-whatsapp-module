@@ -95,11 +95,11 @@ jobs:
         run: |
           VERSION="${{ steps.version.outputs.version }}"
           
-          # Extraer la sección del changelog para esta versión
-          CHANGELOG=$(awk "/^## $VERSION /,/^## [0-9]/" ChangeLog.md | sed '$d' | tail -n +2)
+          # Extraer la sección del changelog para esta versión (soporta formato "## X.X" o "## X.X - fecha")
+          CHANGELOG=$(awk "/^## ${VERSION}[^0-9]/,/^## [0-9]/" ChangeLog.md | sed '$d' | tail -n +2)
           
           # Si no se encuentra changelog específico, usar mensaje por defecto
-          if [ -z "$CHANGELOG" ]; then
+          if [ -z "$CHANGELOG" ] || [ "$CHANGELOG" = "" ]; then
             CHANGELOG="No changelog available for this version."
           fi
           
