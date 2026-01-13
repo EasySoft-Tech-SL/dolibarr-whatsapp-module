@@ -95,13 +95,18 @@ jobs:
         run: |
           VERSION="${{ steps.version.outputs.version }}"
           
-          # Extraer la sección del changelog para esta versión (soporta formato "## X.X" o "## X.X - fecha")
-          CHANGELOG=$(awk "/^## ${VERSION}[^0-9]/,/^## [0-9]/" ChangeLog.md | sed '$d' | tail -n +2)
+          # Extraer la sección del changelog para esta versión usando sed
+          # Captura desde "## VERSION" hasta el próximo "## " (siguiente versión)
+          CHANGELOG=$(sed -n "/^## ${VERSION}/,/^## /p" ChangeLog.md | sed '1d;$d')
           
           # Si no se encuentra changelog específico, usar mensaje por defecto
-          if [ -z "$CHANGELOG" ] || [ "$CHANGELOG" = "" ]; then
-            CHANGELOG="No changelog available for this version."
+          if [ -z "$CHANGELOG" ]; then
+            CHANGELOG="No hay changelog disponible para esta versión."
           fi
+          
+          # Debug: mostrar lo que se extrajo
+          echo "Extracted changelog:"
+          echo "$CHANGELOG"
           
           # Guardar en variable de entorno usando heredoc para manejar multilinea
           echo "changelog<<EOF" >> $GITHUB_OUTPUT
