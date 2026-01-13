@@ -1,0 +1,143 @@
+name: Build Module Release
+
+on:
+  push:
+    branches:
+      - main
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1'
+          extensions: mbstring, xml, json
+      
+      - name: Extract module version
+        id: version
+        run: |
+          # Extraer versión directamente del archivo usando grep y regex
+          # Soporta formatos: 'X.X', 'X.X.X', "X.X", "X.X.X"
+          VERSION=$(grep -oP "\\\$this->version\s*=\s*['\"]([0-9]+\.[0-9]+(\.[0-9]+)?)['\"]" core/modules/modWhatsapp.class.php | grep -oP "[0-9]+\.[0-9]+(\.[0-9]+)?")
+          
+          # Validar que la versión tiene formato X.X o X.X.X
+          if [[ ! $VERSION =~ ^[0-9]+\.[0-9]+(\.[0-9]+)?$ ]]; then
+              echo "Error: Invalid version format: $VERSION"
+              exit 1
+          fi
+          
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Module version detected: $VERSION"
+      
+      - name: Create module archive
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+          ARCHIVE_NAME="module_whatsapp-${VERSION}.zip"
+          
+          echo "Creating archive: $ARCHIVE_NAME"
+          
+          # Crear directorio temporal con la estructura deseada
+          mkdir -p temp_build/whatsapp
+          
+          # Copiar todos los archivos al directorio whatsapp, excluyendo archivos innecesarios
+          rsync -av --exclude='.git' \
+            --exclude='.github' \
+            --exclude='.vscode' \
+            --exclude='.idea' \
+            --exclude='node_modules' \
+            --exclude='.DS_Store' \
+            --exclude='Thumbs.db' \
+            --exclude='*.log' \
+            --exclude='temp_build' \
+            --exclude='test' \
+            --exclude='phpunit.xml' \
+            --exclude='.editorconfig' \
+            ./ temp_build/whatsapp/
+          
+          # Crear el archivo zip desde el directorio temporal
+          cd temp_build
+          zip -r "../$ARCHIVE_NAME" whatsapp
+          cd ..
+          
+          # Limpiar directorio temporal
+          rm -rf temp_build
+          
+          # Verificar que el archivo se creó correctamente
+          if [ ! -f "$ARCHIVE_NAME" ]; then
+              echo "Error: Archive was not created"
+              exit 1
+          fi
+          
+          # Mostrar información del archivo
+          ls -lh "$ARCHIVE_NAME"
+          
+          # Verificar estructura del zip
+          echo "Archive structure:"
+          unzip -l "$ARCHIVE_NAME" | head -30
+          
+          echo "archive_name=$ARCHIVE_NAME" >> $GITHUB_OUTPUT
+        id: archive
+      
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: module_whatsapp-${{ steps.version.outputs.version }}
+          path: module_whatsapp-${{ steps.version.outputs.version }}.zip
+          retention-days: 90
+          if-no-files-found: error
+      
+      - name: Create GitHub Release
+        if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ steps.version.outputs.version }}
+          name: Release v${{ steps.version.outputs.version }}
+          body: |
+            ## WhatsApp Module v${{ steps.version.outputs.version }}
+            
+            Versión compilada automáticamente desde la rama principal.
+            
+            ### 📦 Instalación
+            1. Descargar el archivo `module_whatsapp-${{ steps.version.outputs.version }}.zip`
+            2. Descomprimir en `custom/whatsapp/` de tu instalación de Dolibarr
+            3. Activar el módulo desde el panel de administración
+            
+            ### 📋 Cambios
+            Ver [ChangeLog.md](https://github.com/${{ github.repository }}/blob/main/ChangeLog.md) para detalles completos.
+            
+            ### ℹ️ Información
+            - **Commit**: ${{ github.sha }}
+            - **Branch**: ${{ github.ref_name }}
+            - **Build Date**: ${{ github.event.head_commit.timestamp }}
+          files: module_whatsapp-${{ steps.version.outputs.version }}.zip
+          draft: false
+          prerelease: false
+          fail_on_unmatched_files: true
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Build summary
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+          ARCHIVE_NAME="module_whatsapp-${VERSION}.zip"
+          ARCHIVE_SIZE=$(ls -lh "$ARCHIVE_NAME" | awk '{print $5}')
+          
+          echo "## 📦 Build Successful" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- **Version**: $VERSION" >> $GITHUB_STEP_SUMMARY
+          echo "- **Archive**: $ARCHIVE_NAME" >> $GITHUB_STEP_SUMMARY
+          echo "- **Size**: $ARCHIVE_SIZE" >> $GITHUB_STEP_SUMMARY
+          echo "- **Branch**: ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Commit**: ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "✅ WhatsApp module compiled and ready for distribution" >> $GITHUB_STEP_SUMMARY
