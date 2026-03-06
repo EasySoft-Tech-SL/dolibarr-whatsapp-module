@@ -72,7 +72,7 @@ class modWhatsapp extends DolibarrModules
 		$this->editor_url = 'https://www.easysoft.es';
 
 		// Possible values for version are: 'development', 'experimental', 'dolibarr', 'dolibarr_deprecated' or a version string like 'x.y.z'
-		$this->version = '1.3';
+		$this->version = '1.4';
 		// Url to the file with your last numberversion of this module
 		//$this->url_last_version = 'http://www.example.com/versionmodule.txt';
 
@@ -344,6 +344,12 @@ class modWhatsapp extends DolibarrModules
 		// Main menu entries to add
 		$this->menu = array();
 		$r = 0;
+
+		// Compute a base position that does not collide with any existing menu entry
+		$resql = $this->db->query("SELECT MAX(position) FROM " . $this->db->prefix() . "menu");
+		$row = $this->db->fetch_row($resql);
+		$basePosition = ($row[0] ?? 0) + 1;
+
 		// Add here entries to declare new menus
 		/* BEGIN MODULEBUILDER TOPMENU */
 		/* $this->menu[$r++] = array(
@@ -355,7 +361,7 @@ class modWhatsapp extends DolibarrModules
 			'leftmenu' => '',
 			'url' => '/whatsapp/whatsappindex.php',
 			'langs' => 'whatsapp@whatsapp', // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
-			'position' => 1000 + $r,
+			'position' => $basePosition + $r,
 			'enabled' => '$conf->whatsapp->enabled', // Define condition to show or hide menu entry. Use '$conf->whatsapp->enabled' if entry must be visible if module is enabled.
 			'perms' => '1', // Use 'perms'=>'$user->rights->whatsapp->templates->read' if you want your menu with a permission rules
 			'target' => '',
@@ -373,7 +379,7 @@ class modWhatsapp extends DolibarrModules
 			'leftmenu' => 'templates',
 			/* 'url' => '/whatsapp/whatsappindex.php', */
 			'langs' => 'whatsapp@whatsapp',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
-			'position' => 1000 + $r,
+			'position' => $basePosition + $r,
 			'enabled' => '$conf->whatsapp->enabled',  // Define condition to show or hide menu entry. Use '$conf->whatsapp->enabled' if entry must be visible if module is enabled.
 			'perms' => '$user->rights->whatsapp->templates->read',			                // Use 'perms'=>'$user->rights->whatsapp->level1->level2' if you want your menu with a permission rules
 			'target' => '',
@@ -387,7 +393,7 @@ class modWhatsapp extends DolibarrModules
 			'leftmenu' => 'whatsapp_templates_list',
 			'url' => '/whatsapp/templates_list.php',
 			'langs' => 'whatsapp@whatsapp',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
-			'position' => 1000 + $r,
+			'position' => $basePosition + $r,
 			'enabled' => '$conf->whatsapp->enabled',  // Define condition to show or hide menu entry. Use '$conf->whatsapp->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
 			'perms' => '$user->rights->whatsapp->templates->read',			                // Use 'perms'=>'$user->rights->whatsapp->level1->level2' if you want your menu with a permission rules
 			'target' => '',
@@ -401,7 +407,7 @@ class modWhatsapp extends DolibarrModules
 			'leftmenu' => 'whatsapp_templates_new',
 			'url' => '/whatsapp/templates_card.php?action=create',
 			'langs' => 'whatsapp@whatsapp',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
-			'position' => 1000 + $r,
+			'position' => $basePosition + $r,
 			'enabled' => '$conf->whatsapp->enabled',  // Define condition to show or hide menu entry. Use '$conf->whatsapp->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
 			'perms' => '$user->rights->whatsapp->templates->write',			                // Use 'perms'=>'$user->rights->whatsapp->level1->level2' if you want your menu with a permission rules
 			'target' => '',
@@ -420,7 +426,7 @@ class modWhatsapp extends DolibarrModules
 			'leftmenu' => 'webhooklog',
 			/* 			'url' => '/whatsapp/whatsappindex.php', */
 			'langs' => 'whatsapp@whatsapp',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
-			'position' => 1000 + $r,
+			'position' => $basePosition + $r,
 			'enabled' => '$conf->whatsapp->enabled',  // Define condition to show or hide menu entry. Use '$conf->whatsapp->enabled' if entry must be visible if module is enabled.
 			'perms' => '$user->rights->whatsapp->webhooklog->read',			                // Use 'perms'=>'$user->rights->whatsapp->level1->level2' if you want your menu with a permission rules
 			'target' => '',
@@ -434,7 +440,7 @@ class modWhatsapp extends DolibarrModules
 			'leftmenu' => 'whatsapp_webhooklog_list',
 			'url' => '/whatsapp/webhooklog_list.php',
 			'langs' => 'whatsapp@whatsapp',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
-			'position' => 1000 + $r,
+			'position' => $basePosition + $r,
 			'enabled' => '$conf->whatsapp->enabled',  // Define condition to show or hide menu entry. Use '$conf->whatsapp->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
 			'perms' => '$user->rights->whatsapp->webhooklog->read',			                // Use 'perms'=>'$user->rights->whatsapp->level1->level2' if you want your menu with a permission rules
 			'target' => '',
@@ -448,7 +454,7 @@ class modWhatsapp extends DolibarrModules
 			'leftmenu' => 'whatsapp_templates_new',
 			'url' => '/whatsapp/templates_card.php?action=create',
 			'langs' => 'whatsapp@whatsapp',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
-			'position' => 1000 + $r,
+			'position' => $basePosition + $r,
 			'enabled' => '$conf->whatsapp->enabled',  // Define condition to show or hide menu entry. Use '$conf->whatsapp->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
 			'perms' => '$user->rights->whatsapp->templates->write',			                // Use 'perms'=>'$user->rights->whatsapp->level1->level2' if you want your menu with a permission rules
 			'target' => '',

@@ -1,5 +1,16 @@
 # CHANGELOG WHATSAPP FOR [DOLIBARR ERP CRM](https://www.dolibarr.org)
 
+## [1.4] - 2026-03-06
+
+### 🐛 Correcciones
+- **✅ Colisión de posición de menú al activar el módulo**: Corregido error *"Menu entry (all,1001,) already exists"* que se producía cuando el módulo `eventorganization` u otros módulos con posición 1001 estaban activos simultáneamente.
+  - La posición base del menú se calcula ahora dinámicamente consultando `MAX(position)` en `llx_menu`, evitando cualquier colisión futura con otros módulos instalados.
+
+### 📝 Archivos Modificados
+- `core/modules/modWhatsapp.class.php` - Versión 1.4 y cálculo dinámico de posición de menú
+
+---
+
 ## [1.3] - 2026-01-13
 
 ### ✨ Nueva Funcionalidad: Programación de Notificaciones WhatsApp
