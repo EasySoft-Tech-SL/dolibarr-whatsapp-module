@@ -389,21 +389,98 @@ if (!$whatConf) {
 
 		// Intentar obtener el QR Code de la API
 		// Obtener QR Code
+		print '<div id="wa-qr-container">';
 		try {
 			$qrCode = $instanceStatus['qr_code'] ?? null;
 			if ($qrCode) {
 				$qrImageData = $qrCode;
-				print  '<img src="' . $qrImageData . '" alt="QR Code" style="max-width:100%;height:auto;">';
-				print  '<div style="margin-top:8px;font-size:12px;color:#666;">' . $langs->trans("Escanea el código QR para conectar") . '</div>';
+				print  '<img id="wa-qr-image" src="' . $qrImageData . '" alt="QR Code" style="max-width:100%;height:auto;">';
+				print  '<div style="margin-top:8px;font-size:12px;color:#666;">' . $langs->trans("WhatsappScanQR") . '</div>';
+			} else {
+				print  '<div style="color:#888;padding:10px;">' . $langs->trans("WhatsappQRNotAvailable") . '</div>';
 			}
 		} catch (Exception $e) {
 			print  '<div style="color:#dc3545;padding:10px;border:1px solid #dc3545;border-radius:4px;">
-                    <i class="fa fa-exclamation-circle"></i> ' . $langs->trans("Error al obtener código QR") . ':<br>' . $e->getMessage() . '
+                    <i class="fa fa-exclamation-circle"></i> ' . $langs->trans("WhatsappQRError") . ':<br>' . dol_escape_htmltag($e->getMessage()) . '
                 </div>';
 		}
+		print '</div>'; // wa-qr-container
+
+		// Countdown and status
+		print '<div id="wa-qr-status" style="margin-top:10px;">';
+		print '<span id="wa-qr-countdown" style="font-size:13px;color:#888;"></span>';
+		print '</div>';
 
 		print '</td>';
 		print '</tr>';
+
+		// JavaScript for auto-refresh QR
+		$ajaxUrl = dol_buildpath('/whatsapp/ajax/checkInstanceStatus.php', 1);
+		print '<script type="text/javascript">
+		$(document).ready(function() {
+			var waQrInterval = 5; // seconds
+			var waQrTimer = null;
+			var waQrCountdown = waQrInterval;
+			var waQrPolling = true;
+
+			function waQrUpdateCountdown() {
+				var el = document.getElementById("wa-qr-countdown");
+				if (el) {
+					el.innerHTML = "' . dol_escape_js($langs->trans("WhatsappQRRefreshIn")) . ' " + waQrCountdown + "s";
+				}
+			}
+
+			function waQrCheckStatus() {
+				if (!waQrPolling) return;
+				$.ajax({
+					url: "' . $ajaxUrl . '",
+					type: "GET",
+					dataType: "json",
+					timeout: 10000,
+					success: function(data) {
+						if (data.status === "ok") {
+							if (data.connected) {
+								// Connected! Reload page to show connected state
+								waQrPolling = false;
+								var el = document.getElementById("wa-qr-countdown");
+								if (el) el.innerHTML = "<span style=\"color:green;font-weight:bold;\"><i class=\"fas fa-check-circle\"></i> ' . dol_escape_js($langs->trans("WhatsappConnected")) . ' — ' . dol_escape_js($langs->trans("WhatsappReloading")) . '...</span>";
+								setTimeout(function() { window.location.reload(); }, 1500);
+							} else {
+								// Still disconnected, refresh QR
+								var container = document.getElementById("wa-qr-container");
+								if (container && data.qr_code) {
+									var img = document.getElementById("wa-qr-image");
+									if (img) {
+										img.src = data.qr_code;
+									} else {
+										container.innerHTML = \'<img id="wa-qr-image" src="\' + data.qr_code + \'" alt="QR Code" style="max-width:100%;height:auto;"><div style="margin-top:8px;font-size:12px;color:#666;">' . dol_escape_js($langs->trans("WhatsappScanQR")) . '</div>\';
+									}
+								} else if (container && !data.qr_code) {
+									container.innerHTML = \'<div style="color:#888;padding:10px;">' . dol_escape_js($langs->trans("WhatsappQRNotAvailable")) . '</div>\';
+								}
+								// Reset countdown
+								waQrCountdown = waQrInterval;
+							}
+						}
+					},
+					error: function() {
+						// On error, just reset countdown and try again
+						waQrCountdown = waQrInterval;
+					}
+				});
+			}
+
+			// Start countdown timer
+			waQrUpdateCountdown();
+			waQrTimer = setInterval(function() {
+				waQrCountdown--;
+				if (waQrCountdown <= 0) {
+					waQrCheckStatus();
+				}
+				waQrUpdateCountdown();
+			}, 1000);
+		});
+		</script>';
 	} else {
 		// Si está conectado, mostrar el formulario de prueba de envío
 		print '</table>';

@@ -135,9 +135,24 @@ class ActionsWhatsapp
 
 		$error = 0; // Error counter
 
+		$contexts = explode(':', $parameters['context']);
+		$isActionCard = in_array('actioncard', $contexts) || in_array('globalcard', $contexts);
+
+		// ===== Save schedule dates to session for trigger processing =====
+		// Works for both create (add) and edit (update) actions
+		if ($isActionCard && in_array($action, array('add', 'update'))
+			&& GETPOST('actioncode', 'aZ09') == 'AC_SEND_WHATSAPP_NOTIFY'
+		) {
+			$scheduleDates = GETPOST('wa_schedule_dates', 'array');
+			// For create: only save if there are dates. For update: always save (allows clearing).
+			if (!empty($scheduleDates) || $action == 'update') {
+				$cleanDates = !empty($scheduleDates) ? array_values(array_filter(array_map('trim', $scheduleDates))) : array();
+				$_SESSION['wa_recurrence_pending'] = array('dates' => $cleanDates);
+			}
+		}
 
 		/* print_r($parameters); print_r($object); echo "action: " . $action; */
-		if (in_array('globalcard', explode(':', $parameters['context'])) && $action == 'confirm_send_whatsapp_form') {
+		if (in_array('globalcard', $contexts) && $action == 'confirm_send_whatsapp_form') {
 			dol_include_once('/core/class/html.form.class.php');
 			dol_include_once('/whatsapp/lib/whatsapp_templates.lib.php');
 			dol_include_once('/whatsapp/lib/whatsapp.lib.php');
@@ -695,6 +710,86 @@ class ActionsWhatsapp
 			print  '<div style="width:100% !important;text-align:left !important">' . $formconfirm . '</div>';
 			/* return 1; */
 		}
+
+
+
+	}
+
+
+	/**
+	 * Hook formObjectOptions - Render WhatsApp recurrence designer inside create/edit forms
+	 */
+	public function formObjectOptions($parameters, &$object, &$action, $hookmanager)
+	{
+		global $conf, $user, $langs;
+
+		if (empty($user->rights->whatsapp->read)) {
+			return 0;
+		}
+
+		$contexts = explode(':', $parameters['context']);
+		if (!in_array('actioncard', $contexts) && !in_array('globalcard', $contexts)) {
+			return 0;
+		}
+		if (!($object instanceof ActionComm)) {
+			return 0;
+		}
+
+		$langs->load('whatsapp@whatsapp');
+
+		// Determine current type_code
+		$currentTypeCode = '';
+		if ($action == 'create') {
+			$currentTypeCode = GETPOST('actioncode', 'aZ09');
+		} elseif ($action == 'edit' && $object->id > 0) {
+			$currentTypeCode = GETPOSTISSET('actioncode') ? GETPOST('actioncode', 'aZ09') : $object->type_code;
+		}
+
+		$isWhatsappType = ($currentTypeCode == 'AC_SEND_WHATSAPP_NOTIFY');
+
+		if ($action == 'create' || $action == 'edit') {
+			// Load existing schedules for edit mode
+			$existingDates = array();
+			$sentDates = array();
+			if ($action == 'edit' && $object->id > 0) {
+				dol_include_once('/whatsapp/class/reminderschedule.class.php');
+				$scheduleObj = new ReminderSchedule($this->db);
+				$schedules = $scheduleObj->fetchAllByActionComm($object->id);
+				if (is_array($schedules)) {
+					foreach ($schedules as $s) {
+						if ($s->status == ReminderSchedule::STATUS_PENDING || $s->status == ReminderSchedule::STATUS_DISABLED) {
+							$existingDates[] = dol_print_date($s->reminder_date, '%Y-%m-%dT%H:%M');
+						} elseif ($s->status == ReminderSchedule::STATUS_SENT || $s->status == ReminderSchedule::STATUS_ERROR) {
+							$sentDates[] = $s;
+						}
+					}
+				}
+			}
+
+			$dateCount = count($existingDates);
+
+			// Include edit mode template
+			include dol_buildpath('/whatsapp/tpl/recurrence_edit.tpl.php', 0);
+		} elseif ($object instanceof ActionComm && $object->id > 0 && $action != 'create' && $action != 'edit') {
+			// ===== VIEW MODE: show existing schedules with AJAX management =====
+			$object->fetch_optionals();
+			$currentTypeCode = $object->type_code;
+
+			if ($currentTypeCode == 'AC_SEND_WHATSAPP_NOTIFY') {
+				dol_include_once('/whatsapp/class/reminderschedule.class.php');
+				$scheduleObj = new ReminderSchedule($this->db);
+				$schedules = $scheduleObj->fetchAllByActionComm($object->id);
+				$scheduleCount = is_array($schedules) ? count($schedules) : 0;
+
+				$baseDateValue = !empty($object->array_options['options_whatsapp_notification_datetime']) ? $object->array_options['options_whatsapp_notification_datetime'] : '';
+				$ajaxUrl = dol_buildpath('/whatsapp/ajax/reminderSchedule.php', 1);
+
+				// Include view mode template
+				include dol_buildpath('/whatsapp/tpl/recurrence_view.tpl.php', 0);
+			}
+		}
+
+		return 0;
 	}
 
 

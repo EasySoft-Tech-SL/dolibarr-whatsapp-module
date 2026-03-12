@@ -330,6 +330,83 @@ class InterfaceWhatsappTriggers extends DolibarrTriggers
 				$object->array_options['options_whatsapp_server_instance_name'] = $whatConf['server_instance_name'];
 				$object->updateExtrafield('whatsapp_server_instance_name');
 			}
+
+			// Process schedule dates from session (set during form submit)
+			$this->processScheduleDatesFromSession($object, $user, $langs, false);
 		}
+	}
+
+	function actionModify($action, $object, User $user, Translate $langs, Conf $conf)
+	{
+		if ($object instanceof ActionComm && $object->type_code == 'AC_SEND_WHATSAPP_NOTIFY') {
+			// Process schedule dates from session, replacing existing pending/disabled entries
+			$this->processScheduleDatesFromSession($object, $user, $langs, true);
+		}
+	}
+
+	/**
+	 * Process schedule dates from session data
+	 *
+	 * @param CommonObject $object       The ActionComm object
+	 * @param User         $user         User object
+	 * @param Translate    $langs        Langs object
+	 * @param bool         $deleteExisting Whether to delete existing modifiable schedules first (edit mode)
+	 * @return int Number of schedules created
+	 */
+	private function processScheduleDatesFromSession($object, $user, $langs, $deleteExisting = false)
+	{
+		if (!isset($_SESSION['wa_recurrence_pending']) || $object->id <= 0) {
+			return 0;
+		}
+
+		dol_include_once('/whatsapp/class/reminderschedule.class.php');
+		$waData = $_SESSION['wa_recurrence_pending'];
+		unset($_SESSION['wa_recurrence_pending']);
+
+		// Delete existing modifiable schedules if requested (edit mode)
+		if ($deleteExisting) {
+			$scheduleObj = new ReminderSchedule($this->db);
+			$scheduleObj->deleteModifiableByActionComm($object->id);
+		}
+
+		$dates = !empty($waData['dates']) ? $waData['dates'] : array();
+		$created = 0;
+
+		foreach ($dates as $dateStr) {
+			$dateStr = trim($dateStr);
+			if (empty($dateStr)) continue;
+
+			// Parse datetime-local format: YYYY-MM-DDTHH:MM
+			$parts = explode('T', $dateStr);
+			$datePart = $parts[0];
+			$timePart = isset($parts[1]) ? $parts[1] : '09:00';
+
+			$timestamp = dol_mktime(
+				(int) substr($timePart, 0, 2),
+				(int) substr($timePart, 3, 2),
+				0,
+				(int) substr($datePart, 5, 2),
+				(int) substr($datePart, 8, 2),
+				(int) substr($datePart, 0, 4),
+				'tzuserrel'
+			);
+
+			if ($timestamp > 0) {
+				$schedule = new ReminderSchedule($this->db);
+				$schedule->fk_actioncomm = $object->id;
+				$schedule->reminder_date = $timestamp;
+				$schedule->status = ReminderSchedule::STATUS_PENDING;
+				if ($schedule->create($user) > 0) {
+					$created++;
+				}
+			}
+		}
+
+		if ($created > 0) {
+			$langs->load('whatsapp@whatsapp');
+			setEventMessages($langs->trans('WhatsappSchedulesCreated', $created), null, 'mesgs');
+		}
+
+		return $created;
 	}
 }

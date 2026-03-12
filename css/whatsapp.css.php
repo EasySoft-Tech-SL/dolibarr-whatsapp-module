@@ -1453,6 +1453,86 @@ if (empty($dolibarr_nocache)) {
   border-radius: 12px 12px 0 0 !important;
 }
 
+/* ===== WhatsApp Recurrence Designer ===== */
+.wa-recurrence-designer {
+  margin-top: 20px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 15px;
+  background: #fafafa;
+}
+
+.wa-recurrence-designer .titre {
+  font-size: 1.1em;
+  margin-bottom: 12px;
+}
+
+.wa-recurrence-designer .titre .badge {
+  background: #25D366;
+  color: white;
+  border-radius: 10px;
+  padding: 2px 8px;
+  font-size: 0.8em;
+  vertical-align: middle;
+}
+
+.wa-recurrence-form {
+  margin-bottom: 15px;
+}
+
+.wa-recurrence-form input[type="number"] {
+  text-align: center;
+}
+
+.wa-recurrence-form .butAction.small {
+  font-size: 0.85em;
+  padding: 4px 12px;
+}
+
+.wa-schedule-list {
+  margin-top: 10px;
+}
+
+.wa-schedule-table {
+  border: 1px solid #e0e0e0;
+}
+
+.wa-schedule-table .liste_titre th {
+  background: #f5f5f5;
+  font-weight: 600;
+}
+
+.wa-schedule-table .badge {
+  font-size: 0.8em;
+  padding: 3px 8px;
+  border-radius: 4px;
+}
+
+.wa-schedule-toggle,
+.wa-schedule-delete {
+  cursor: pointer;
+  padding: 2px 5px;
+}
+
+.wa-schedule-toggle:hover i {
+  color: #ff9800;
+}
+
+.wa-schedule-delete:hover i {
+  color: #dc3545;
+}
+
+#wa_preview_dates ol {
+  margin: 0;
+  padding-left: 20px;
+}
+
+#wa_preview_dates ol li {
+  padding: 1px 0;
+  font-family: monospace;
+  font-size: 0.9em;
+}
+
 .wa-chat-header-info {
   display: flex !important;
   align-items: center !important;

@@ -29,7 +29,8 @@ class WhatsappUtils extends CommonObject
 	{
 		global $conf, $langs, $user;
 		dol_include_once('/comm/action/class/actioncomm.class.php');
-		dol_include_once('/custom/whatsapp/lib/whatsapp.lib.php');
+		dol_include_once('/whatsapp/lib/whatsapp.lib.php');
+		dol_include_once('/whatsapp/class/reminderschedule.class.php');
 
 		$error = 0;
 		$this->output = '';
@@ -49,16 +50,42 @@ class WhatsappUtils extends CommonObject
 
 		dol_syslog(__METHOD__, LOG_DEBUG);
 
+		// ===== PHASE 1: Send from new schedule table =====
+		$scheduleObj = new ReminderSchedule($this->db);
+		$pendingSchedules = $scheduleObj->fetchPendingToSend();
+
+		if (is_array($pendingSchedules) && count($pendingSchedules) > 0) {
+			foreach ($pendingSchedules as $pending) {
+				$result = $this->sendReminderForActionComm($pending->fk_actioncomm, $actioncomm, $errorsMsg);
+				if ($result > 0) {
+					$nbMessagesSent++;
+					// Mark schedule as sent
+					$sched = new ReminderSchedule($this->db);
+					$sched->id = $pending->schedule_id;
+					$sched->updateStatus(ReminderSchedule::STATUS_SENT);
+				} else {
+					// Mark schedule as error
+					$sched = new ReminderSchedule($this->db);
+					$sched->id = $pending->schedule_id;
+					$sched->updateStatus(ReminderSchedule::STATUS_ERROR, end($errorsMsg));
+				}
+			}
+		}
+
+		// ===== PHASE 2: Legacy - Send from extrafields (backward compatibility) =====
+
 		$this->db->begin();
 
-		// Seleccionamos todos los eventos de tipo recordatorio WhatsApp pendientes
+		// Seleccionamos todos los eventos de tipo recordatorio WhatsApp pendientes (solo legacy sin schedule rows)
 		$sql = "SELECT ac.id AS rowid FROM " . MAIN_DB_PREFIX . "actioncomm ac ";
 		$sql .= " LEFT JOIN " . MAIN_DB_PREFIX . "actioncomm_extrafields ace ON ace.fk_object=ac.id ";
+		$sql .= " LEFT JOIN " . MAIN_DB_PREFIX . "whatsapp_reminder_schedule wrs ON wrs.fk_actioncomm=ac.id ";
 		$sql .= " WHERE ac.code = 'AC_SEND_WHATSAPP_NOTIFY'";
 		$sql .= " AND (ace.whatsapp_message_sent IS NULL OR ace.whatsapp_message_sent = 0)";
 		$sql .= " AND ace.whatsapp_notification_datetime IS NOT NULL";
 		$sql .= " AND ace.whatsapp_notification_datetime <= '" . $this->db->idate($now) . "'";
 		$sql .= " AND ac.entity IN (" . getEntity('actioncomm') . ")";
+		$sql .= " AND wrs.rowid IS NULL"; // Exclude events that have schedule entries (handled in Phase 1)
 
 		$resql = $this->db->query($sql);
 
@@ -193,5 +220,85 @@ class WhatsappUtils extends CommonObject
 			$this->error = 'Number of WhatsApp messages sent: ' . $nbMessagesSent . ', ' . (!empty($errorsMsg) ? join(', ', $errorsMsg) : $error);
 			return $error;
 		}
+	}
+
+	/**
+	 * Send a WhatsApp reminder for a specific ActionComm
+	 * Shared logic used by both schedule-based and legacy sending
+	 *
+	 * @param int        $actioncommId  ID of the ActionComm
+	 * @param ActionComm $actioncomm    Reusable ActionComm object
+	 * @param array      $errorsMsg     Reference to errors array
+	 * @return int 1 if sent OK, 0 if error
+	 */
+	private function sendReminderForActionComm($actioncommId, &$actioncomm, &$errorsMsg)
+	{
+		global $conf, $langs;
+
+		$res = $actioncomm->fetch($actioncommId);
+		if ($res < 0) {
+			$errorsMsg[] = "Failed to load actioncomm with ID: " . $actioncommId;
+			return 0;
+		}
+
+		$originObject = dolGetElementObject($actioncomm->fk_element, $actioncomm->elementtype);
+
+		$messageContent = $actioncomm->note_private;
+		if (empty($messageContent)) {
+			$errorsMsg[] = "No message content found for ID=" . $actioncomm->id;
+			return 0;
+		}
+
+		// Apply substitutions
+		$substitutionarray = getCommonSubstitutionArray($langs, 0, '', $actioncomm);
+		complete_substitutions_array($substitutionarray, $langs, $actioncomm);
+		$messageContent = make_substitutions($messageContent, $substitutionarray);
+
+		if ($originObject) {
+			$substitutionarray = getCommonSubstitutionArray($langs, 0, '', $originObject);
+			complete_substitutions_array($substitutionarray, $langs, $originObject);
+			$messageContent = make_substitutions($messageContent, $substitutionarray);
+		}
+
+		// Get phone number
+		$phoneNumber = '';
+		if (!empty($actioncomm->contact_id)) {
+			require_once DOL_DOCUMENT_ROOT . '/contact/class/contact.class.php';
+			$contact = new Contact($this->db);
+			$res = $contact->fetch($actioncomm->contact_id);
+			if ($res > 0) {
+				$phoneNumber = $contact->phone_mobile;
+				if (empty($phoneNumber)) {
+					$phoneNumber = $contact->phone;
+				}
+			}
+		} elseif (!empty($actioncomm->socid)) {
+			require_once DOL_DOCUMENT_ROOT . '/societe/class/societe.class.php';
+			$societe = new Societe($this->db);
+			$res = $societe->fetch($actioncomm->socid);
+			if ($res > 0) {
+				$phoneNumber = $societe->phone;
+			}
+		}
+
+		if (empty($phoneNumber)) {
+			$errorsMsg[] = "No valid phone number found for ID=" . $actioncomm->id;
+			return 0;
+		}
+
+		// Format phone number
+		$phoneNumber = preg_replace('/\s+/', '', $phoneNumber);
+		if (substr($phoneNumber, 0, 1) !== '+') {
+			$defaultCountryCode = !empty($conf->global->WHATSAPP_DEFAULT_COUNTRY_CODE) ? $conf->global->WHATSAPP_DEFAULT_COUNTRY_CODE : '34';
+			$phoneNumber = '+' . $defaultCountryCode . $phoneNumber;
+		}
+
+		$result = sendWhapiText(null, $phoneNumber, $messageContent);
+		if ($result) {
+			return 1;
+		}
+
+		$errorsMsg[] = "Error sending WhatsApp message to: " . $phoneNumber;
+		return 0;
 	}
 }
