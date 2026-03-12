@@ -72,6 +72,27 @@ class WhatsappUtils extends CommonObject
 			}
 		}
 
+		// ===== PHASE 1.5: Retry failed schedules =====
+		$maxRetries = !empty($conf->global->WHATSAPP_REMINDER_MAX_RETRIES) ? (int) $conf->global->WHATSAPP_REMINDER_MAX_RETRIES : 3;
+		$retrySchedules = $scheduleObj->fetchRetryable($maxRetries);
+
+		if (is_array($retrySchedules) && count($retrySchedules) > 0) {
+			foreach ($retrySchedules as $retry) {
+				$result = $this->sendReminderForActionComm($retry->fk_actioncomm, $actioncomm, $errorsMsg);
+				if ($result > 0) {
+					$nbMessagesSent++;
+					$sched = new ReminderSchedule($this->db);
+					$sched->id = $retry->schedule_id;
+					$sched->updateStatus(ReminderSchedule::STATUS_SENT);
+				} else {
+					// updateStatus with STATUS_ERROR increments retry_count
+					$sched = new ReminderSchedule($this->db);
+					$sched->id = $retry->schedule_id;
+					$sched->updateStatus(ReminderSchedule::STATUS_ERROR, end($errorsMsg));
+				}
+			}
+		}
+
 		// ===== PHASE 2: Legacy - Send from extrafields (backward compatibility) =====
 
 		$this->db->begin();

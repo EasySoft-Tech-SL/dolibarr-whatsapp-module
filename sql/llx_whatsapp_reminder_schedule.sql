@@ -21,6 +21,8 @@ CREATE TABLE llx_whatsapp_reminder_schedule(
 	status smallint NOT NULL DEFAULT 1,
 	date_sent datetime NULL DEFAULT NULL,
 	error_msg varchar(255) NULL DEFAULT NULL,
+	retry_count smallint NOT NULL DEFAULT 0,
+	fk_webhook_log integer NULL DEFAULT NULL,
 	date_creation datetime NOT NULL,
 	tms timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=innodb;

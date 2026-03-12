@@ -217,6 +217,56 @@ switch ($action) {
 		$response['schedules'] = getScheduleListHtml($db, $fk_actioncomm, $langs);
 		break;
 
+	case 'update_date':
+		$scheduleId = GETPOST('schedule_id', 'int');
+		$newDate = GETPOST('new_date', 'alpha');
+		$newTime = GETPOST('new_time', 'alpha');
+
+		if (empty($scheduleId) || empty($newDate)) {
+			$response['message'] = $langs->trans('MissingParameters');
+			break;
+		}
+
+		$timeStr = $newTime ? $newTime : '09:00';
+		$dateParts = explode('-', $newDate);
+		$timeParts = explode(':', $timeStr);
+		if (count($dateParts) != 3 || count($timeParts) < 2) {
+			$response['message'] = $langs->trans('InvalidParameter');
+			break;
+		}
+		$newTimestamp = dol_mktime((int)$timeParts[0], (int)$timeParts[1], 0, (int)$dateParts[1], (int)$dateParts[2], (int)$dateParts[0]);
+		if (!$newTimestamp) {
+			$response['message'] = $langs->trans('InvalidParameter');
+			break;
+		}
+
+		$scheduleObj = new ReminderSchedule($db);
+		$res = $scheduleObj->fetch($scheduleId);
+		if ($res > 0) {
+			$result = $scheduleObj->updateReminderDate($newTimestamp);
+			if ($result > 0) {
+				$response['status'] = 'success';
+				$response['schedules'] = getScheduleListHtml($db, $scheduleObj->fk_actioncomm, $langs);
+			} elseif ($result == -2) {
+				$response['message'] = $langs->trans('WhatsappScheduleCannotEditDate');
+			} else {
+				$response['message'] = $scheduleObj->error;
+			}
+		} else {
+			$response['message'] = $langs->trans('WhatsappScheduleNotFound');
+		}
+		break;
+
+	case 'get_summary':
+		if (empty($fk_actioncomm)) {
+			$response['message'] = $langs->trans('MissingParameters');
+			break;
+		}
+		$scheduleObj = new ReminderSchedule($db);
+		$response['status'] = 'success';
+		$response['counts'] = $scheduleObj->getCountsByStatus($fk_actioncomm);
+		break;
+
 	default:
 		$response['message'] = 'Unknown action';
 		break;
@@ -243,7 +293,28 @@ function getScheduleListHtml($db, $fk_actioncomm, $langs)
 		return '<div class="opacitymedium">' . $langs->trans('WhatsappNoSchedules') . '</div>';
 	}
 
-	$html = '<table class="noborder centpercent wa-schedule-table">';
+	// Summary bar
+	$counts = $scheduleObj->getCountsByStatus($fk_actioncomm);
+	$html = '<div class="wa-schedule-summary">';
+	if ($counts[ReminderSchedule::STATUS_SENT] > 0) {
+		$html .= '<span class="badge badge-status6" title="' . $langs->trans('WhatsappScheduleSent') . '"><i class="fas fa-check"></i> ' . $counts[ReminderSchedule::STATUS_SENT] . ' ' . $langs->trans('WhatsappScheduleSent') . '</span> ';
+	}
+	if ($counts[ReminderSchedule::STATUS_PENDING] > 0) {
+		$html .= '<span class="badge badge-status1" title="' . $langs->trans('WhatsappSchedulePending') . '"><i class="fas fa-clock"></i> ' . $counts[ReminderSchedule::STATUS_PENDING] . ' ' . $langs->trans('WhatsappSchedulePending') . '</span> ';
+	}
+	if ($counts['overdue'] > 0) {
+		$html .= '<span class="badge badge-status8" title="' . $langs->trans('WhatsappScheduleOverdue') . '"><i class="fas fa-exclamation-circle"></i> ' . $counts['overdue'] . ' ' . $langs->trans('WhatsappScheduleOverdue') . '</span> ';
+	}
+	if ($counts[ReminderSchedule::STATUS_ERROR] > 0) {
+		$html .= '<span class="badge badge-status8" title="' . $langs->trans('WhatsappScheduleError') . '"><i class="fas fa-times"></i> ' . $counts[ReminderSchedule::STATUS_ERROR] . ' ' . $langs->trans('WhatsappScheduleError') . '</span> ';
+	}
+	if ($counts[ReminderSchedule::STATUS_DISABLED] > 0) {
+		$html .= '<span class="badge badge-status4" title="' . $langs->trans('WhatsappScheduleDisabled') . '"><i class="fas fa-ban"></i> ' . $counts[ReminderSchedule::STATUS_DISABLED] . ' ' . $langs->trans('WhatsappScheduleDisabled') . '</span> ';
+	}
+	$html .= '<span class="opacitymedium small">(' . $langs->trans('Total') . ': ' . $counts['total'] . ')</span>';
+	$html .= '</div>';
+
+	$html .= '<table class="noborder centpercent wa-schedule-table">';
 	$html .= '<thead><tr class="liste_titre">';
 	$html .= '<th>' . $langs->trans('Date') . '</th>';
 	$html .= '<th>' . $langs->trans('Time') . '</th>';
@@ -254,6 +325,7 @@ function getScheduleListHtml($db, $fk_actioncomm, $langs)
 	$html .= '<tbody>';
 
 	$now = dol_now();
+	$webhookLogUrl = dol_buildpath('/whatsapp/webhooklog_list.php', 1);
 	foreach ($schedules as $sched) {
 		$statusClass = ReminderSchedule::getStatusBadgeClass($sched->status);
 		$statusLabel = ReminderSchedule::getStatusLabel($sched->status);
@@ -261,16 +333,48 @@ function getScheduleListHtml($db, $fk_actioncomm, $langs)
 		$canModify = ($sched->status == ReminderSchedule::STATUS_PENDING || $sched->status == ReminderSchedule::STATUS_DISABLED);
 
 		$html .= '<tr class="oddeven' . ($isOverdue ? ' wa-schedule-overdue' : '') . '">';
-		$html .= '<td>' . dol_print_date($sched->reminder_date, 'day') . '</td>';
-		$html .= '<td>' . dol_print_date($sched->reminder_date, 'hour') . '</td>';
+
+		// Date column - editable for modifiable entries
+		if ($canModify) {
+			$html .= '<td class="wa-inline-edit-date" data-id="' . $sched->id . '" data-date="' . dol_print_date($sched->reminder_date, '%Y-%m-%d') . '" title="' . $langs->trans('WhatsappScheduleClickToEditDate') . '" style="cursor:pointer">';
+			$html .= dol_print_date($sched->reminder_date, 'day');
+			$html .= ' <i class="fas fa-pencil-alt opacitymedium" style="font-size:0.8em"></i>';
+			$html .= '</td>';
+			$html .= '<td class="wa-inline-edit-time" data-id="' . $sched->id . '" data-time="' . dol_print_date($sched->reminder_date, '%H:%M') . '" title="' . $langs->trans('WhatsappScheduleClickToEditDate') . '" style="cursor:pointer">';
+			$html .= dol_print_date($sched->reminder_date, 'hour');
+			$html .= ' <i class="fas fa-pencil-alt opacitymedium" style="font-size:0.8em"></i>';
+			$html .= '</td>';
+		} else {
+			$html .= '<td>' . dol_print_date($sched->reminder_date, 'day') . '</td>';
+			$html .= '<td>' . dol_print_date($sched->reminder_date, 'hour') . '</td>';
+		}
+
+		// Status column with retry info for error
 		$html .= '<td class="center">';
 		if ($isOverdue) {
 			$html .= '<span class="badge badge-status8"><i class="fas fa-clock" style="margin-right:3px"></i>' . $langs->trans('WhatsappScheduleOverdue') . '</span>';
 		} else {
 			$html .= '<span class="' . $statusClass . '">' . $statusLabel . '</span>';
 		}
+		if ($sched->status == ReminderSchedule::STATUS_ERROR && $sched->retry_count > 0) {
+			$maxRetries = !empty($GLOBALS['conf']->global->WHATSAPP_REMINDER_MAX_RETRIES) ? (int) $GLOBALS['conf']->global->WHATSAPP_REMINDER_MAX_RETRIES : 3;
+			$html .= ' <span class="opacitymedium small">(' . $langs->trans('WhatsappScheduleRetryCount', $sched->retry_count, $maxRetries) . ')</span>';
+		}
 		$html .= '</td>';
-		$html .= '<td class="center">' . ($sched->date_sent ? dol_print_date($sched->date_sent, 'dayhour') : '-') . '</td>';
+
+		// Date sent column with webhook log link
+		$html .= '<td class="center">';
+		if ($sched->date_sent) {
+			$html .= dol_print_date($sched->date_sent, 'dayhour');
+			if ($sched->fk_webhook_log > 0) {
+				$html .= ' <a href="' . dol_buildpath('/whatsapp/webhooklog_card.php', 1) . '?id=' . $sched->fk_webhook_log . '" title="' . $langs->trans('WhatsappScheduleViewLog') . '" target="_blank"><i class="fas fa-external-link-alt opacitymedium" style="font-size:0.8em"></i></a>';
+			}
+		} else {
+			$html .= '-';
+		}
+		$html .= '</td>';
+
+		// Actions column
 		$html .= '<td class="center nowraponall">';
 
 		if ($canModify) {
@@ -283,9 +387,19 @@ function getScheduleListHtml($db, $fk_actioncomm, $langs)
 			$html .= '<i class="fas fa-trash-alt pictodelete"></i>';
 			$html .= '</a>';
 		} elseif ($sched->status == ReminderSchedule::STATUS_ERROR) {
-			$html .= '<span class="small" title="' . dol_escape_htmltag($sched->error_msg) . '"><i class="fas fa-exclamation-triangle warning"></i></span>';
+			$errorTitle = dol_escape_htmltag($sched->error_msg);
+			if ($sched->retry_count > 0) {
+				$maxRetries = !empty($GLOBALS['conf']->global->WHATSAPP_REMINDER_MAX_RETRIES) ? (int) $GLOBALS['conf']->global->WHATSAPP_REMINDER_MAX_RETRIES : 3;
+				$errorTitle .= ' | ' . $langs->trans('WhatsappScheduleRetryCount', $sched->retry_count, $maxRetries);
+			}
+			$html .= '<span class="small" title="' . $errorTitle . '"><i class="fas fa-exclamation-triangle warning"></i></span>';
+			// Link to webhook log list for error entries
+			$html .= ' <a href="' . $webhookLogUrl . '" title="' . $langs->trans('WhatsappScheduleViewLog') . '" target="_blank"><i class="fas fa-list-alt opacitymedium" style="font-size:0.85em"></i></a>';
 		} else {
+			// Sent successfully
 			$html .= '<i class="fas fa-check-circle" style="color:#28a745"></i>';
+			// Link to webhook log for sent entries
+			$html .= ' <a href="' . $webhookLogUrl . '" title="' . $langs->trans('WhatsappScheduleViewLog') . '" target="_blank"><i class="fas fa-list-alt opacitymedium" style="font-size:0.85em"></i></a>';
 		}
 
 		$html .= '</td>';

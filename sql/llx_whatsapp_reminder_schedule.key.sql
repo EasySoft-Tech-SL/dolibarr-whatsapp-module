@@ -15,4 +15,5 @@
 
 ALTER TABLE llx_whatsapp_reminder_schedule ADD INDEX idx_wa_rs_fk_actioncomm (fk_actioncomm);
 ALTER TABLE llx_whatsapp_reminder_schedule ADD INDEX idx_wa_rs_reminder_date_status (reminder_date, status);
+ALTER TABLE llx_whatsapp_reminder_schedule ADD INDEX idx_wa_rs_fk_webhook_log (fk_webhook_log);
 ALTER TABLE llx_whatsapp_reminder_schedule ADD CONSTRAINT fk_wa_rs_actioncomm FOREIGN KEY (fk_actioncomm) REFERENCES llx_actioncomm(id) ON DELETE CASCADE;

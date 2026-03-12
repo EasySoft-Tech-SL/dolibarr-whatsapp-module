@@ -37,6 +37,8 @@ class ReminderSchedule extends CommonObject
 	public $status;
 	public $date_sent;
 	public $error_msg;
+	public $retry_count;
+	public $fk_webhook_log;
 	public $date_creation;
 	public $tms;
 
@@ -84,7 +86,7 @@ class ReminderSchedule extends CommonObject
 	 */
 	public function fetch($id)
 	{
-		$sql = "SELECT rowid, fk_actioncomm, reminder_date, status, date_sent, error_msg, date_creation, tms";
+		$sql = "SELECT rowid, fk_actioncomm, reminder_date, status, date_sent, error_msg, retry_count, fk_webhook_log, date_creation, tms";
 		$sql .= " FROM " . MAIN_DB_PREFIX . $this->table_element;
 		$sql .= " WHERE rowid = " . ((int) $id);
 
@@ -99,6 +101,8 @@ class ReminderSchedule extends CommonObject
 				$this->status = $obj->status;
 				$this->date_sent = $this->db->jdate($obj->date_sent);
 				$this->error_msg = $obj->error_msg;
+				$this->retry_count = (int) $obj->retry_count;
+				$this->fk_webhook_log = $obj->fk_webhook_log ? (int) $obj->fk_webhook_log : null;
 				$this->date_creation = $this->db->jdate($obj->date_creation);
 				$this->tms = $this->db->jdate($obj->tms);
 				return 1;
@@ -124,6 +128,9 @@ class ReminderSchedule extends CommonObject
 		}
 		if (!empty($error_msg)) {
 			$sql .= ", error_msg = '" . $this->db->escape(dol_trunc($error_msg, 250)) . "'";
+		}
+		if ($status == self::STATUS_ERROR) {
+			$sql .= ", retry_count = retry_count + 1";
 		}
 		$sql .= " WHERE rowid = " . ((int) $this->id);
 
@@ -161,7 +168,7 @@ class ReminderSchedule extends CommonObject
 	public function fetchAllByActionComm($fk_actioncomm)
 	{
 		$results = array();
-		$sql = "SELECT rowid, fk_actioncomm, reminder_date, status, date_sent, error_msg, date_creation, tms";
+		$sql = "SELECT rowid, fk_actioncomm, reminder_date, status, date_sent, error_msg, retry_count, fk_webhook_log, date_creation, tms";
 		$sql .= " FROM " . MAIN_DB_PREFIX . $this->table_element;
 		$sql .= " WHERE fk_actioncomm = " . ((int) $fk_actioncomm);
 		$sql .= " ORDER BY reminder_date ASC";
@@ -177,6 +184,8 @@ class ReminderSchedule extends CommonObject
 				$line->status = $obj->status;
 				$line->date_sent = $this->db->jdate($obj->date_sent);
 				$line->error_msg = $obj->error_msg;
+				$line->retry_count = (int) $obj->retry_count;
+				$line->fk_webhook_log = $obj->fk_webhook_log ? (int) $obj->fk_webhook_log : null;
 				$line->date_creation = $this->db->jdate($obj->date_creation);
 				$line->tms = $this->db->jdate($obj->tms);
 				$results[] = $line;
@@ -376,5 +385,119 @@ class ReminderSchedule extends CommonObject
 		}
 		$this->error = $this->db->lasterror();
 		return -1;
+	}
+
+	/**
+	 * Update the webhook log reference for this schedule
+	 * @param int $fk_webhook_log WebhookLog ID
+	 * @return int >0 if OK, <0 if KO
+	 */
+	public function updateWebhookLog($fk_webhook_log)
+	{
+		$sql = "UPDATE " . MAIN_DB_PREFIX . $this->table_element;
+		$sql .= " SET fk_webhook_log = " . ((int) $fk_webhook_log);
+		$sql .= " WHERE rowid = " . ((int) $this->id);
+
+		$resql = $this->db->query($sql);
+		if ($resql) {
+			$this->fk_webhook_log = (int) $fk_webhook_log;
+			return 1;
+		}
+		$this->error = $this->db->lasterror();
+		return -1;
+	}
+
+	/**
+	 * Fetch error schedules eligible for retry
+	 * @param int $maxRetries Maximum number of retries allowed
+	 * @return array|int Array of objects or -1 if KO
+	 */
+	public function fetchRetryable($maxRetries = 3)
+	{
+		$now = dol_now();
+		$results = array();
+
+		$sql = "SELECT rs.rowid as schedule_id, rs.fk_actioncomm, rs.reminder_date, rs.retry_count";
+		$sql .= " FROM " . MAIN_DB_PREFIX . $this->table_element . " rs";
+		$sql .= " JOIN " . MAIN_DB_PREFIX . "actioncomm ac ON ac.id = rs.fk_actioncomm";
+		$sql .= " WHERE rs.status = " . self::STATUS_ERROR;
+		$sql .= " AND rs.retry_count < " . ((int) $maxRetries);
+		$sql .= " AND ac.code = 'AC_SEND_WHATSAPP_NOTIFY'";
+		$sql .= " AND ac.entity IN (" . getEntity('actioncomm') . ")";
+		$sql .= " ORDER BY rs.reminder_date ASC";
+
+		$resql = $this->db->query($sql);
+		if ($resql) {
+			while ($obj = $this->db->fetch_object($resql)) {
+				$results[] = $obj;
+			}
+			return $results;
+		}
+		$this->error = $this->db->lasterror();
+		return -1;
+	}
+
+	/**
+	 * Update the reminder_date of a modifiable schedule entry
+	 * @param int $newDate New timestamp for the reminder
+	 * @return int >0 if OK, <0 if KO
+	 */
+	public function updateReminderDate($newDate)
+	{
+		if (!in_array($this->status, array(self::STATUS_PENDING, self::STATUS_DISABLED))) {
+			$this->error = 'Cannot update date of a non-modifiable schedule';
+			return -2;
+		}
+
+		$sql = "UPDATE " . MAIN_DB_PREFIX . $this->table_element;
+		$sql .= " SET reminder_date = '" . $this->db->idate($newDate) . "'";
+		$sql .= " WHERE rowid = " . ((int) $this->id);
+
+		$resql = $this->db->query($sql);
+		if ($resql) {
+			$this->reminder_date = $newDate;
+			return 1;
+		}
+		$this->error = $this->db->lasterror();
+		return -1;
+	}
+
+	/**
+	 * Get counts per status for a given actioncomm
+	 * @param int $fk_actioncomm ActionComm ID
+	 * @return array Associative array with status => count and 'overdue' key
+	 */
+	public function getCountsByStatus($fk_actioncomm)
+	{
+		$now = dol_now();
+		$counts = array(
+			self::STATUS_DISABLED => 0,
+			self::STATUS_PENDING => 0,
+			self::STATUS_SENT => 0,
+			self::STATUS_ERROR => 0,
+			'overdue' => 0,
+			'total' => 0
+		);
+
+		$sql = "SELECT status, reminder_date FROM " . MAIN_DB_PREFIX . $this->table_element;
+		$sql .= " WHERE fk_actioncomm = " . ((int) $fk_actioncomm);
+
+		$resql = $this->db->query($sql);
+		if ($resql) {
+			while ($obj = $this->db->fetch_object($resql)) {
+				$status = (int) $obj->status;
+				if (isset($counts[$status])) {
+					$counts[$status]++;
+				}
+				$counts['total']++;
+				$reminderDate = $this->db->jdate($obj->reminder_date);
+				if ($status == self::STATUS_PENDING && $reminderDate < $now) {
+					$counts['overdue']++;
+				}
+			}
+			return $counts;
+		}
+		$this->error = $this->db->lasterror();
+		return $counts;
 	}
 }
