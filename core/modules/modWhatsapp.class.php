@@ -72,7 +72,7 @@ class modWhatsapp extends DolibarrModules
 		$this->editor_url = 'https://www.easysoft.es';
 
 		// Possible values for version are: 'development', 'experimental', 'dolibarr', 'dolibarr_deprecated' or a version string like 'x.y.z'
-		$this->version = '1.6';
+		$this->version = '1.7';
 		// Url to the file with your last numberversion of this module
 		//$this->url_last_version = 'http://www.example.com/versionmodule.txt';
 
@@ -169,7 +169,7 @@ class modWhatsapp extends DolibarrModules
 			1 => array('MAIN_AGENDA_ACTIONAUTO_SEND_WHATSAPP', 'chaine', '1', 'This is a constant to add', 1),
 			2 => array('MAIN_AGENDA_ACTIONAUTO_SEND_WHATSAPP_AUDIO', 'chaine', '1', 'This is a constant to add', 1),
 			3 => array('MAIN_AGENDA_ACTIONAUTO_SEND_WHATSAPP_PDF', 'chaine', '1', 'This is a constant to add', 1),
-			4 => array('WHATSAPP_SERVER_URL', 'chaine', 'https://whapi.easysoft.es', 'URL of the Whatsapp API server', 1, 'current', 0),
+			4 => array('WHATSAPP_SERVER_URL', 'chaine', 'https://newwhapi.easysoft.es', 'URL of the Whatsapp API server', 1, 'current', 0),
 			5 => array('AGENDA_USE_EVENT_TYPE', 'chaine', '1', '', 0, 'current', 0),
 		);
 

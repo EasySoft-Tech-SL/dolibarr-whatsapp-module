@@ -1,5 +1,14 @@
 # CHANGELOG WHATSAPP FOR [DOLIBARR ERP CRM](https://www.dolibarr.org)
 
+## [1.7] - 2026-03-13
+
+### 🔧 Cambio de infraestructura API
+
+- **🌐 Nuevo endpoint por defecto**: Se actualiza `WHATSAPP_SERVER_URL` para apuntar a `https://newwhapi.easysoft.es`.
+
+### 📝 Archivos Modificados
+- `core/modules/modWhatsapp.class.php` – Versión 1.7 y actualización de URL API por defecto
+
 ## [1.6] - 2026-03-12
 
 ### ✨ Nuevas Funcionalidades
