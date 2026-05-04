@@ -115,6 +115,9 @@ if ($resql) {
 $item = $formSetup->newItem('WHATSAPP_WEBHOOK_USER_ID')->setAsSelect($users);
 $item = $formSetup->newItem('WHATSAPP_SHOW_ON_GETNOMURL')->setAsYesNo();
 $item = $formSetup->newItem('MAIN_WHATSAPP_PHONE_PREFIX');
+$item = $formSetup->newItem('WHATSAPP_STATUS_CACHE_TTL');
+$item->defaultFieldValue = '300';
+$item->cssClass = 'maxwidth100';
 // // Hôte
 // $item = $formSetup->newItem('NO_PARAM_JUST_TEXT');
 // $item->fieldOverride = (empty($_SERVER['HTTPS']) ? 'http://' : 'https://') . $_SERVER['HTTP_HOST'];

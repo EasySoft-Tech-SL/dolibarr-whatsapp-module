@@ -1,5 +1,29 @@
 # CHANGELOG WHATSAPP FOR [DOLIBARR ERP CRM](https://www.dolibarr.org)
 
+## [1.8] - 2026-05-04
+
+### ⚡ Mejoras de rendimiento
+
+- **🚀 Caché del estado de conexión WhatsApp**: El icono del menú superior ya no realiza una petición HTTP al servidor WhatsApp en cada carga de página. El estado se cachea en sesión durante 300 s (configurable) y solo se refresca por AJAX al abrir el desplegable. Esto reduce drásticamente la latencia de todas las páginas cuando el servidor WhatsApp está lento o caído.
+- **⚙️ Nueva configuración `WHATSAPP_STATUS_CACHE_TTL`**: TTL del caché de estado en segundos (por defecto `300`). Se puede ajustar desde la página de configuración del módulo. Usar `0` desactiva la caché.
+- **🔄 Refresco del QR vía AJAX**: El desplegable ya no recarga la página entera cada 30 s con `setInterval(window.location.reload)`. Ahora actualiza solo la imagen del QR vía `checkInstanceStatus.php` y solo mientras está abierto. La petición AJAX repuebla la caché de sesión para que la siguiente carga PHP la reutilice.
+- **🧹 Invalidación de caché en logout**: Al desconectar la instancia desde el desplegable se invalida la caché para que el siguiente render muestre el estado real.
+- **🗃️ Eliminación de N+1 en listados/footer**: Nueva función `countObjectWhatsappMessages()` que usa `SELECT COUNT(*)` en lugar de hidratar todos los `ActionComm` con sus extrafields. Memoizada por request. Aplicada en `getNomUrl` (badge en cada enlace de objeto) y `printCommonFooter` (botón flotante de WhatsApp). En un listado de 100 facturas con 20 mensajes cada una, se pasa de ~2100 consultas SQL a 100.
+
+### 🌐 Traducciones
+- **📋 1 nueva clave** añadida en los 6 idiomas (ES, EN, FR, DE, IT, PT):
+  - `WHATSAPP_STATUS_CACHE_TTL` y su `Tooltip`
+
+### 📝 Archivos Modificados
+- `core/modules/modWhatsapp.class.php` – Versión 1.8
+- `class/actions_whatsapp.class.php` – Caché de sesión en `printTopRightMenu`, lazy-load AJAX del desplegable, sustitución de `getObjectWhatsappMessages` por `countObjectWhatsappMessages` en `getNomUrl` y `printCommonFooter`
+- `lib/whatsapp.lib.php` – Nueva función `countObjectWhatsappMessages()` con caché por request
+- `ajax/checkInstanceStatus.php` – Repuebla la caché de sesión en cada llamada
+- `admin/setup.php` – Nueva opción configurable `WHATSAPP_STATUS_CACHE_TTL` (300 s por defecto)
+- `langs/{es_ES,en_US,fr_FR,de_DE,it_IT,pt_PT}/whatsapp.lang` – Traducciones de la nueva clave
+
+---
+
 ## [1.7] - 2026-03-13
 
 ### 🔧 Cambio de infraestructura API

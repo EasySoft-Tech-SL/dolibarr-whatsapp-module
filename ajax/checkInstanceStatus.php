@@ -89,6 +89,14 @@ try {
 	$instanceStatus = getInstanceStatus($whatConf['server_token'], $whatConf['server_url']);
 	$isConnected = $instanceStatus['connected'] ?? false;
 
+	// Refresh the session cache used by printTopRightMenu so subsequent page loads
+	// don't need to hit the WhatsApp HTTP server again for ~60s.
+	$_SESSION['whatsapp_status_cache'] = array(
+		'key' => md5($whatConf['server_url'] . '|' . $whatConf['server_token']),
+		'ts' => time(),
+		'data' => is_array($instanceStatus) ? $instanceStatus : array(),
+	);
+
 	if ($isConnected) {
 		echo json_encode(array(
 			'status' => 'ok',

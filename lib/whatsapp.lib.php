@@ -807,6 +807,67 @@ function getObjectWhatsappMessages($fk_element, $elementtype, $code = ['AC_SEND_
 }
 
 /**
+ * Count whatsapp actioncomm rows for a given object without hydrating them.
+ * Per-request memoized to avoid repeated queries when the same badge is rendered
+ * multiple times on the same page (lists, footer, getNomUrl).
+ *
+ * @param int    $fk_element  Object id
+ * @param string $elementtype Element type ('societe', 'invoice', 'order', ...)
+ * @param array  $code        ActionComm codes to match
+ * @param int    $socid       Optional socid scope
+ * @return int
+ */
+function countObjectWhatsappMessages($fk_element, $elementtype, $code = ['AC_SEND_WHATSAPP'], $socid = 0)
+{
+	global $db;
+	static $cache = array();
+
+	switch ($elementtype) {
+		case 'facture':
+			$elementtype = 'invoice';
+			break;
+		case 'commande':
+			$elementtype = 'order';
+			break;
+	}
+
+	if (!is_array($code)) {
+		$code = [$code];
+	}
+
+	$cacheKey = $elementtype . '|' . intval($fk_element) . '|' . intval($socid) . '|' . implode(',', $code);
+	if (isset($cache[$cacheKey])) {
+		return $cache[$cacheKey];
+	}
+
+	$conditions = [];
+	foreach ($code as $singleCode) {
+		$conditions[] = "ac.code LIKE '%" . $db->escape($singleCode) . "%'";
+	}
+
+	$sql = "SELECT COUNT(ac.id) as nb FROM " . MAIN_DB_PREFIX . "actioncomm ac";
+	$sql .= " WHERE (" . implode(" OR ", $conditions) . ")";
+	if ($elementtype == 'societe') {
+		$sql .= " AND ac.fk_soc = " . intval($fk_element);
+	} elseif ($socid > 0) {
+		$sql .= " AND ac.fk_soc = " . intval($socid);
+	} else {
+		$sql .= " AND ac.fk_element = " . intval($fk_element) . " AND ac.elementtype = '" . $db->escape($elementtype) . "'";
+	}
+
+	$resql = $db->query($sql);
+	$nb = 0;
+	if ($resql) {
+		$obj = $db->fetch_object($resql);
+		if ($obj) {
+			$nb = (int) $obj->nb;
+		}
+	}
+	$cache[$cacheKey] = $nb;
+	return $nb;
+}
+
+/**
  * Return link url to an object
  *
  * @param 	int		$objectid		Id of record

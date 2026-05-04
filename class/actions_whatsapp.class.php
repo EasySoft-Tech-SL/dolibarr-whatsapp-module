@@ -100,8 +100,7 @@ class ActionsWhatsapp
 			&& !empty($object->array_options['options_whatsapp_phone_number']) */
 			/* true */) {
 			dol_include_once('/whatsapp/lib/whatsapp.lib.php');
-			$whatsAppMessages = getObjectWhatsappMessages($object->id, $object->element, ['AC_SEND_WHATSAPP', 'AC_RECEIVE_WHATSAPP']);
-			$messageCount = count($whatsAppMessages);
+			$messageCount = countObjectWhatsappMessages($object->id, $object->element, ['AC_SEND_WHATSAPP', 'AC_RECEIVE_WHATSAPP']);
 			$html = '';
 			// Implementación mejorada con estructura HTML más limpia
 			$html .= '<span class="wa-icon-container wa-show-history" data-id="' . $object->id . '" data-type="' . $object->element . '" title="' . $langs->trans("WhatsAppHistory") . '">';
@@ -419,9 +418,7 @@ class ActionsWhatsapp
 		dol_include_once('/whatsapp/lib/whatsapp.lib.php');
 		$whatConf = getWhatsappConf();
 		if ($user->rights->whatsapp->read && $whatConf && $object->id > 0) {
-			// Obtener cantidad de mensajes para este objeto
-			$whatsAppMessages = getObjectWhatsappMessages($object->id, $object->element, ['AC_SEND_WHATSAPP', 'AC_RECEIVE_WHATSAPP'], true, ($object->fk_soc ? $object->fk_soc : 0));
-			$messageCount = count($whatsAppMessages);
+			$messageCount = countObjectWhatsappMessages($object->id, $object->element, ['AC_SEND_WHATSAPP', 'AC_RECEIVE_WHATSAPP'], ($object->fk_soc ? $object->fk_soc : 0));
 
 			print '
 			<div class="wa-floating-container">
@@ -817,19 +814,40 @@ class ActionsWhatsapp
 
 		// Verificar si la configuración está completa
 		if ($whatConf) {
-			// Verificar estado de la conexión
-			try {
+			// Cached status to avoid hitting the WhatsApp HTTP server on every page load.
+			// The dropdown also refreshes via AJAX (checkInstanceStatus.php) when opened.
+			// TTL is configurable via WHATSAPP_STATUS_CACHE_TTL (seconds). 0 disables the cache.
+			$cacheTtl = isset($conf->global->WHATSAPP_STATUS_CACHE_TTL)
+				? (int) $conf->global->WHATSAPP_STATUS_CACHE_TTL
+				: 300;
+			$cached = isset($_SESSION['whatsapp_status_cache']) ? $_SESSION['whatsapp_status_cache'] : null;
+			$cacheKey = md5($whatConf['server_url'] . '|' . $whatConf['server_token']);
+			$cacheValid = $cacheTtl > 0
+				&& is_array($cached)
+				&& isset($cached['key'], $cached['ts'], $cached['data'])
+				&& $cached['key'] === $cacheKey
+				&& (time() - (int) $cached['ts']) < $cacheTtl;
 
-				$instanceStatus = getInstanceStatus($whatConf['server_token'], $whatConf['server_url']);
-				$isConnected = $instanceStatus['connected'] ?? false;
-				/* $instanceStatus = true;
-				$isConnected =  true; */
-			} catch (\Throwable $th) {
+			if ($cacheValid) {
+				$instanceStatus = $cached['data'];
+				$isConnected = !empty($instanceStatus['connected']);
+			} else {
+				try {
+					$instanceStatus = getInstanceStatus($whatConf['server_token'], $whatConf['server_url']);
+					$isConnected = $instanceStatus['connected'] ?? false;
+					$_SESSION['whatsapp_status_cache'] = array(
+						'key' => $cacheKey,
+						'ts' => time(),
+						'data' => is_array($instanceStatus) ? $instanceStatus : array(),
+					);
+				} catch (\Throwable $th) {
+				}
 			}
 
 			// Acciones
 			if ($action == 'whatsapp_logout' && !empty($user->rights->whatsapp->admin) && $isConnected) {
 				$result = logoutInstance();
+				unset($_SESSION['whatsapp_status_cache']);
 				if ($result) {
 					setEventMessages($langs->trans("WhatsappLogoutSuccess"), null, 'mesgs');
 				} else {
@@ -869,16 +887,14 @@ class ActionsWhatsapp
 			$dropdownContent .= '<div style="padding:15px;background:white;">';
 
 			if (!$isConnected) {
-				$dropdownContent .= '<div style="margin:10px auto;text-align:center;background:#f8f9fa;padding:15px;border-radius:8px;max-width:250px;">';
+				$dropdownContent .= '<div class="wa-qr-area" style="margin:10px auto;text-align:center;background:#f8f9fa;padding:15px;border-radius:8px;max-width:250px;">';
 
-				// Obtener QR Code
+				// Obtener QR Code (puede estar vacío si la cache es vieja; el JS lo refrescará al abrir)
 				try {
 					$qrCode = $instanceStatus['qr_code'] ?? null;
-					if ($qrCode) {
-						$qrImageData = $qrCode;
-						$dropdownContent .= '<img src="' . $qrImageData . '" alt="QR Code" style="max-width:100%;height:auto;">';
-						$dropdownContent .= '<div style="margin-top:8px;font-size:12px;color:#666;">' . $langs->trans("Escanea el código QR para conectar") . '</div>';
-					}
+					$qrImageData = $qrCode ?: '';
+					$dropdownContent .= '<img src="' . $qrImageData . '" alt="QR Code" style="max-width:100%;height:auto;' . ($qrImageData ? '' : 'display:none;') . '">';
+					$dropdownContent .= '<div style="margin-top:8px;font-size:12px;color:#666;">' . $langs->trans("Escanea el código QR para conectar") . '</div>';
 				} catch (Exception $e) {
 					$dropdownContent .= '<div style="color:#dc3545;padding:10px;border:1px solid #dc3545;border-radius:4px;">
                     <i class="fa fa-exclamation-circle"></i> ' . $langs->trans("Error al obtener código QR") . ':<br>' . $e->getMessage() . '
@@ -954,16 +970,49 @@ class ActionsWhatsapp
         </div>';
 
 			// Agregar script para manejar el comportamiento del dropdown
+			$ajaxStatusUrl = dol_buildpath('/whatsapp/ajax/checkInstanceStatus.php', 1);
 			$html .= '
         <script>
         $(document).ready(function() {
+            var waStatusUrl = ' . json_encode($ajaxStatusUrl) . ';
+            var waPollTimer = null;
+
+            function waRefreshStatus() {
+                return $.getJSON(waStatusUrl).done(function(resp) {
+                    if (!resp || resp.status !== "ok") return;
+                    var $body = $("#whatsapp-menu-dropdown .dropdown-menu");
+                    if (resp.connected) {
+                        $body.find(".wa-qr-area").remove();
+                        if (waPollTimer) { clearInterval(waPollTimer); waPollTimer = null; }
+                    } else if (resp.qr_code) {
+                        var $qr = $body.find(".wa-qr-area img");
+                        if ($qr.length) {
+                            $qr.attr("src", resp.qr_code).show();
+                        }
+                    }
+                });
+            }
+
             $("#whatsapp-menu-dropdown > a.dropdown-toggle").click(function(e) {
                 e.preventDefault();
-                if($(this).parent().hasClass("open")) {
-                    $(this).parent().removeClass("open");
+                var $parent = $(this).parent();
+                if ($parent.hasClass("open")) {
+                    $parent.removeClass("open");
+                    if (waPollTimer) { clearInterval(waPollTimer); waPollTimer = null; }
                 } else {
                     $(".dropdown").removeClass("open");
-                    $(this).parent().addClass("open");
+                    $parent.addClass("open");
+                    // Refrescar al abrir y, si sigue desconectado, cada 30s mientras esté abierto
+                    waRefreshStatus();
+                    if (!waPollTimer) {
+                        waPollTimer = setInterval(function() {
+                            if (!$("#whatsapp-menu-dropdown").hasClass("open")) {
+                                clearInterval(waPollTimer); waPollTimer = null;
+                                return;
+                            }
+                            waRefreshStatus();
+                        }, 30000);
+                    }
                 }
                 return false;
             });
@@ -971,6 +1020,9 @@ class ActionsWhatsapp
             // Cerrar al hacer clic fuera del dropdown
             $(document).click(function(e) {
                 if(!$(e.target).closest("#whatsapp-menu-dropdown").length) {
+                    if ($("#whatsapp-menu-dropdown").hasClass("open") && waPollTimer) {
+                        clearInterval(waPollTimer); waPollTimer = null;
+                    }
                     $("#whatsapp-menu-dropdown").removeClass("open");
                 }
             });
@@ -979,16 +1031,6 @@ class ActionsWhatsapp
             $("#whatsapp-menu-dropdown .dropdown-menu").click(function(e) {
                 e.stopPropagation();
             });
-
-            // Auto-refrescar el QR code cada 30 segundos si está desconectado
-            var isConnected = ' . ($isConnected ? 'true' : 'false') . ';
-            if (!isConnected) {
-                setInterval(function() {
-                    if ($("#whatsapp-menu-dropdown").hasClass("open")) {
-                        window.location.reload();
-                    }
-                }, 30000);
-            }
         });
         </script>';
 		} else {
