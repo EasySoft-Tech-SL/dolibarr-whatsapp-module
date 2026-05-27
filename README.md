@@ -26,6 +26,7 @@ Integra de forma completa WhatsApp en tu sistema Dolibarr utilizando la API prof
 - ✅ **Triggers personalizados** para eventos de Dolibarr
 - ✅ **Envío masivo** de mensajes
 - ✅ **Programación de mensajes** diferidos
+- ✅ **Cola de mensajería con envío escalonado** (anti-SPAM): N mensajes cada X minutos, con reintentos y control de errores
 
 ### 🎯 **Integración Completa**
 - ✅ **Terceros** (Sociétés) - Envío directo desde fichas
@@ -129,6 +130,15 @@ git clone https://github.com/usuario/whatsapp.git whatsapp
 | `WHATSAPP_WEBHOOK_USER_ID` | Usuario para procesar webhooks | ❌ |
 | `WHATSAPP_SHOW_ON_GETNOMURL` | Mostrar botón WhatsApp en fichas | ❌ |
 | `MAIN_WHATSAPP_PHONE_PREFIX` | Prefijo telefónico por defecto | ❌ |
+| `WHATSAPP_QUEUE_MAX_PER_RUN` | Mensajes a enviar por ejecución del cron (N) | ❌ |
+| `WHATSAPP_QUEUE_WINDOW_SECONDS` | Ventana mínima entre lotes en segundos (X) | ❌ |
+| `WHATSAPP_QUEUE_JITTER_SECONDS` | Segundos aleatorios añadidos a la ventana | ❌ |
+| `WHATSAPP_QUEUE_MAX_RETRIES` | Reintentos máximos ante error temporal | ❌ |
+| `WHATSAPP_QUEUE_BACKOFF_SECONDS` | Backoff base entre reintentos (× nº de reintento) | ❌ |
+| `WHATSAPP_FORCE_QUEUE` | Encolar los recordatorios en lugar de enviarlos al instante | ❌ |
+| `WHATSAPP_COMBINE_TEXT_WITH_DOC` | Enviar el texto como pie (caption) del documento, en un único mensaje | ❌ |
+| `WHATSAPP_DEFAULT_COUNTRY_CODE` | Prefijo de país (sin `+`) para normalizar números | ❌ |
+| `WHATSAPP_REMINDER_MAX_RETRIES` | Reintentos máximos de los recordatorios programados | ❌ |
 
 ### 🔗 Configuración de Webhooks
 
@@ -207,6 +217,21 @@ Configurar tarea cron para envío automático:
 ```bash
 # Cada 5 minutos
 */5 * * * * /usr/bin/php /path/to/dolibarr/scripts/cron/cron_run_jobs.php whatsapp sendWhAPIReminder
+```
+
+### Cola de mensajería (envío escalonado anti-SPAM)
+
+Cuando se envían muchos mensajes, conviene espaciarlos para que la conexión no sea marcada como SPAM. La **cola** permite encolar mensajes (texto, documento/PDF, audio) y entregarlos poco a poco mediante la tarea programada `processQueue`.
+
+- **Cadencia "N cada X"**: la tarea acepta parámetros `processQueue(maxToSend, windowSeconds, jitterSeconds)`. Por ejemplo `1, 150, 30` envía **1 mensaje cada 150-180 segundos**. Una guarda interna respeta la ventana aunque el cron se ejecute más a menudo. Los valores también pueden fijarse con las constantes `WHATSAPP_QUEUE_*` desde la configuración.
+- **Control de errores**: los errores permanentes (número inválido, HTTP 4xx, configuración faltante o **fichero inexistente en disco**) se marcan como *Fallido* sin reintentar; los temporales (red, timeout, 5xx, 429) se reintentan con *backoff* hasta `WHATSAPP_QUEUE_MAX_RETRIES`.
+- **Gestión**: en `Utilidades → Cola de WhatsApp` hay un listado con contadores por estado y acciones de reencolar / cancelar / eliminar, y una ficha de detalle con el último error y el código HTTP.
+
+> La tarea de la cola se instala **desactivada**. Actívala en `Configuración → Módulos → Tareas programadas` y ajusta sus parámetros.
+
+```bash
+# Cada minuto (la guarda interna controla la cadencia real)
+* * * * * /usr/bin/php /path/to/dolibarr/scripts/cron/cron_run_jobs.php whatsapp processQueue
 ```
 
 ### Triggers Automáticos
@@ -301,6 +326,32 @@ getInstanceStatus($token, $server);
 // Insertar en agenda
 insertActionIntoAgenda($object, $title, $body, $actiontype, $elementid, $elementtype);
 ```
+
+### Encolar mensajes desde otros módulos
+
+La clase `WhatsappQueue` expone una API estática reutilizable para encolar mensajes desde este o cualquier otro módulo. El cron `processQueue` los enviará de forma escalonada.
+
+```php
+dol_include_once('/whatsapp/class/whatsappqueue.class.php');
+
+// Texto
+WhatsappQueue::enqueueText('+34600111222', 'Hola, su pedido está listo', array(
+    'fk_soc'        => $societe->id,   // opcional
+    'priority'      => 50,             // menor = antes
+    'date_scheduled' => dol_now() + 3600, // opcional: no enviar antes de esta fecha
+    'source_module' => 'mimodulo',     // para trazabilidad
+));
+
+// Documento / PDF (se valida que el fichero exista al enviar)
+WhatsappQueue::enqueueDocument('+34600111222', '/ruta/a/factura.pdf', 'factura.pdf', 'document');
+
+// Audio / nota de voz
+WhatsappQueue::enqueueAudio('+34600111222', '/ruta/a/nota.ogg', 'Transcripción opcional');
+```
+
+Devuelven el `rowid` de la fila encolada (`>0`) o un valor negativo si falla.
+
+📖 **Guía completa de la cola** (cadencia, estados, control de errores, opciones de encolado y referencia): [docs/cola-mensajeria.md](docs/cola-mensajeria.md).
 
 ### Hooks Disponibles
 

@@ -710,6 +710,120 @@ function sendWhapiDocument($object, $phone, $media, $fileName, $mediatype = 'doc
 	}
 }
 
+/**
+ * Decide whether an HTTP error code is permanent (no point retrying) or transient.
+ * Permanent: client errors 4xx (bad number, bad request, unauthorized, not found...).
+ * Transient: network/CURL errors, timeouts (408), rate limit (429) and server errors (5xx).
+ *
+ * @param int $httpCode HTTP status code (0 when there was no HTTP response)
+ * @return bool true if the error is permanent
+ */
+function whatsappIsPermanentError($httpCode)
+{
+	$code = (int) $httpCode;
+	if ($code >= 500) {
+		return false; // server side, retry later
+	}
+	if (in_array($code, array(408, 429))) {
+		return false; // timeout / rate limit, retry later
+	}
+	if ($code >= 400 && $code < 500) {
+		return true; // client error, will never succeed as-is
+	}
+	return false; // 0 / unknown => treat as transient
+}
+
+/**
+ * Low-level POST to the WhatsApp API returning a structured result. Used by the
+ * message queue so it can tell permanent from transient errors and decide whether
+ * to retry. Does NOT show event messages (safe for cron/CLI context).
+ *
+ * @param string $endpointPath Path appended to the configured server URL (e.g. '/api/v1/messages/send-text')
+ * @param array  $payload      Payload to send as JSON
+ * @return array               array(
+ *                                 'success'   => bool,
+ *                                 'http_code' => int,
+ *                                 'error'     => string,
+ *                                 'permanent' => bool,
+ *                                 'content'   => array|null
+ *                             )
+ */
+function whatsappApiPost($endpointPath, $payload)
+{
+	$info = array('success' => false, 'http_code' => 0, 'error' => '', 'permanent' => false, 'content' => null);
+
+	$whatConf = getWhatsappConf();
+	if ($whatConf === false) {
+		$info['error'] = 'WhatsApp configuration missing (server URL or token)';
+		$info['permanent'] = true; // nothing will work until configured
+		return $info;
+	}
+
+	$endpoint = rtrim($whatConf['server_url'], '/') . $endpointPath;
+	$jsonPayload = json_encode($payload);
+	$headers = array(
+		'X-API-Key: ' . $whatConf['server_token'],
+		'Content-Type: application/json',
+		'Content-Length: ' . strlen($jsonPayload),
+	);
+
+	try {
+		$response = getURLContent($endpoint, 'POSTALREADYFORMATED', $jsonPayload, 0, $headers, array('http', 'https'), 2);
+
+		// Network / CURL level error => transient
+		if (!empty($response['curl_error_no'])) {
+			$info['error'] = 'CURL Error: ' . $response['curl_error_msg'];
+			$info['permanent'] = false;
+			return $info;
+		}
+
+		$info['http_code'] = (int) $response['http_code'];
+
+		// HTTP error
+		if ($response['http_code'] != 200 && $response['http_code'] != 201) {
+			$errorContent = '';
+			if (isset($response['content'])) {
+				$jsonError = json_decode($response['content'], true);
+				if ($jsonError && isset($jsonError['error'])) {
+					$errorContent = $jsonError['error'];
+					if (isset($jsonError['details']['message'])) {
+						$errorContent .= ' - ' . $jsonError['details']['message'];
+					}
+				} else {
+					$errorContent = $response['content'];
+				}
+			}
+			$info['error'] = 'HTTP Error ' . $response['http_code'] . ': ' . $errorContent;
+			$info['permanent'] = whatsappIsPermanentError($response['http_code']);
+			return $info;
+		}
+
+		$jsonData = json_decode($response['content'], true);
+		$info['content'] = $jsonData;
+
+		// Invalid JSON despite a 2xx => treat as transient glitch
+		if ($jsonData === null) {
+			$info['error'] = 'Invalid JSON response';
+			$info['permanent'] = false;
+			return $info;
+		}
+
+		if ((isset($jsonData['success']) && $jsonData['success'] === true) || in_array((int) $response['http_code'], array(200, 201))) {
+			$info['success'] = true;
+			return $info;
+		}
+
+		// 2xx but the API explicitly reported a problem => permanent (content issue)
+		$info['error'] = 'API returned success=false or unexpected response';
+		$info['permanent'] = true;
+		return $info;
+	} catch (Exception $e) {
+		$info['error'] = $e->getMessage();
+		$info['permanent'] = false;
+		return $info;
+	}
+}
+
 function insertActionIntoAgenda($object, $title, $body, $actiontypecode, $elementid, $elementtype, $date = null, $instanceName = null)
 {
 	global $langs, $user;

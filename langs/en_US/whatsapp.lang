@@ -369,3 +369,77 @@ WhatsappPlanDetails = Additional details
 Details = Details
 Expired = Expired
 Today = Today
+
+#
+# Message queue
+#
+CronjobWhatsappProcessQueue = Process the WhatsApp message queue
+CronjobWhatsappProcessQueueComment = Sends the WhatsApp queue messages in a throttled way to avoid being flagged as SPAM. The cadence (messages per run, window and jitter) and the retries are configured in the module setup, "Message queue" section. Leave this task parameters empty to use that configuration. Optionally you can force the cadence with positional parameters: maxToSend, windowSeconds, jitterSeconds (e.g. "1, 150, 30").
+WhatsappQueue = WhatsApp queue
+WhatsappQueueList = WhatsApp message queue
+WhatsappQueueMessage = Queued message
+WhatsappQueueSummary = Queue summary
+WhatsappQueueRequeue = Requeue
+WhatsappQueueCancel = Cancel
+WhatsappQueueRequeued = Message requeued successfully
+WhatsappQueueCancelled = Message cancelled
+WhatsappQueueNotRequeable = The message cannot be requeued in its current status
+WhatsappQueueNotCancellable = The message cannot be cancelled in its current status
+WhatsappQueueConfirmDelete = Are you sure you want to delete this queued message?
+WhatsappQueueRecordsUpdated = %s record(s) updated
+WhatsappQueueNoRecordUpdated = No record was updated
+WhatsappQueueStatusPending = Queued
+WhatsappQueueStatusProcessing = Processing
+WhatsappQueueStatusSent = Sent
+WhatsappQueueStatusError = Retrying
+WhatsappQueueStatusFailed = Failed
+WhatsappQueueStatusCancelled = Cancelled
+WhatsappQueueType = Type
+WhatsappQueueTypeText = Text
+WhatsappQueueTypeDocument = Document
+WhatsappQueueTypeAudio = Audio
+WhatsappQueuePhone = Phone
+WhatsappQueueRecipient = Recipient
+WhatsappQueueContent = Content
+WhatsappQueueFile = File
+WhatsappQueueFilePath = File path
+WhatsappQueueMediaType = Media type
+WhatsappQueueScheduled = Scheduled for
+WhatsappQueueScheduledHelp = The message will not be sent before this date. Empty = send as soon as possible.
+WhatsappQueueRetries = Retries
+WhatsappQueueLastError = Last error
+WhatsappQueueHttpCode = HTTP code
+WhatsappQueueNextRetry = Next retry
+WhatsappQueueSentDate = Sent date
+WhatsappQueueSource = Source module
+WhatsappQueueProcessingDate = Processing date
+WhatsappQueueMaxRetries = Max retries
+WhatsappQueueMaxRetriesHelp = Maximum retries for this message. Empty = use the global setup value.
+WhatsappQueueTest = Enqueue test messages
+WhatsappQueueTestHelp = Enqueue a test message (text or document) to check that the queue scheduled task delivers it. Remember to enable the "Process the WhatsApp message queue" cron task.
+WhatsappQueueEnqueue = Enqueue
+WhatsappQueueEnqueuedOk = Message enqueued successfully (ref. #%s)
+WhatsappQueueEnqueuedKo = Could not enqueue the message
+WhatsappQueueUploadFailed = File upload failed
+WhatsappEnqueueSend = Enqueue instead of sending now
+WhatsappEnqueueSendTooltip = Instead of sending immediately, the message (and any attached PDFs) are added to the queue and delivered in a throttled way by the scheduled task.
+WhatsappMessagesQueued = %s item(s) added to the WhatsApp queue
+WHATSAPP_DEFAULT_COUNTRY_CODE = Default country code
+WHATSAPP_DEFAULT_COUNTRY_CODETooltip = Country code (without "+") prepended to numbers that have no international prefix, when normalizing the phone before sending. Default 34 (Spain).
+WHATSAPP_REMINDER_MAX_RETRIES = Reminder retries
+WHATSAPP_REMINDER_MAX_RETRIESTooltip = Number of retries for failed scheduled WhatsApp reminders before giving up. Default 3.
+WHATSAPP_COMBINE_TEXT_WITH_DOC = Combine text and document in one message
+WHATSAPP_COMBINE_TEXT_WITH_DOCTooltip = When sending a document (PDF/image/video) together with text, send the text (subject + body) as the document caption in a single message instead of two separate messages. Applies to both direct send and queue. If the text is longer than 1024 characters it is sent separately.
+WhatsappQueueSettings = WhatsApp message queue
+WHATSAPP_QUEUE_MAX_RETRIES = Max retries
+WHATSAPP_QUEUE_MAX_RETRIESTooltip = Number of retries on transient errors (network, timeout, 5xx, 429) before the message is marked as Failed and dropped from the queue. Permanent errors (invalid number, 4xx, missing file) are not retried. Default 3.
+WHATSAPP_QUEUE_BACKOFF_SECONDS = Backoff between retries (seconds)
+WHATSAPP_QUEUE_BACKOFF_SECONDSTooltip = Base seconds to wait between retries, multiplied by the retry number (retry 1 = 1x, retry 2 = 2x...). Default 300.
+WHATSAPP_QUEUE_MAX_PER_RUN = Messages per run (N)
+WHATSAPP_QUEUE_MAX_PER_RUNTooltip = Maximum number of messages sent on each cron run. Overridden by the 1st scheduled task parameter when provided. Default 1.
+WHATSAPP_QUEUE_WINDOW_SECONDS = Window between batches (seconds)
+WHATSAPP_QUEUE_WINDOW_SECONDSTooltip = Minimum seconds between send batches. Overridden by the 2nd scheduled task parameter when provided. Default 150.
+WHATSAPP_QUEUE_JITTER_SECONDS = Jitter (seconds)
+WHATSAPP_QUEUE_JITTER_SECONDSTooltip = Random seconds added to the window for a more natural sending pattern. Overridden by the 3rd scheduled task parameter when provided. Default 30.
+WHATSAPP_FORCE_QUEUE = Enqueue reminders
+WHATSAPP_FORCE_QUEUETooltip = If enabled, WhatsApp reminders are enqueued instead of being sent immediately, subject to the queue cadence.

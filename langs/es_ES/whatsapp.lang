@@ -369,3 +369,77 @@ WhatsappPlanDetails = Detalles adicionales
 Details = Detalles
 Expired = Expirado
 Today = Hoy
+
+#
+# Message queue
+#
+CronjobWhatsappProcessQueue = Procesar la cola de mensajes de WhatsApp
+CronjobWhatsappProcessQueueComment = Envía los mensajes de la cola de WhatsApp de forma escalonada para evitar ser marcado como SPAM. La cadencia (mensajes por ejecución, ventana y jitter) y los reintentos se configuran en la Configuración del módulo, sección "Cola de mensajería". Deja los parámetros de esta tarea vacíos para usar esa configuración. Opcionalmente puedes forzar la cadencia con parámetros posicionales: maxToSend, windowSeconds, jitterSeconds (ej: "1, 150, 30").
+WhatsappQueue = Cola de WhatsApp
+WhatsappQueueList = Cola de mensajes WhatsApp
+WhatsappQueueMessage = Mensaje en cola
+WhatsappQueueSummary = Resumen de la cola
+WhatsappQueueRequeue = Reencolar
+WhatsappQueueCancel = Cancelar
+WhatsappQueueRequeued = Mensaje reencolado correctamente
+WhatsappQueueCancelled = Mensaje cancelado
+WhatsappQueueNotRequeable = El mensaje no se puede reencolar en su estado actual
+WhatsappQueueNotCancellable = El mensaje no se puede cancelar en su estado actual
+WhatsappQueueConfirmDelete = ¿Seguro que quieres eliminar este mensaje de la cola?
+WhatsappQueueRecordsUpdated = %s registro(s) actualizado(s)
+WhatsappQueueNoRecordUpdated = No se actualizó ningún registro
+WhatsappQueueStatusPending = En cola
+WhatsappQueueStatusProcessing = Procesando
+WhatsappQueueStatusSent = Enviado
+WhatsappQueueStatusError = Reintentando
+WhatsappQueueStatusFailed = Fallido
+WhatsappQueueStatusCancelled = Cancelado
+WhatsappQueueType = Tipo
+WhatsappQueueTypeText = Texto
+WhatsappQueueTypeDocument = Documento
+WhatsappQueueTypeAudio = Audio
+WhatsappQueuePhone = Teléfono
+WhatsappQueueRecipient = Destinatario
+WhatsappQueueContent = Contenido
+WhatsappQueueFile = Fichero
+WhatsappQueueFilePath = Ruta del fichero
+WhatsappQueueMediaType = Tipo de media
+WhatsappQueueScheduled = Programado para
+WhatsappQueueScheduledHelp = El mensaje no se enviará antes de esta fecha. Vacío = enviar lo antes posible.
+WhatsappQueueRetries = Reintentos
+WhatsappQueueLastError = Último error
+WhatsappQueueHttpCode = Código HTTP
+WhatsappQueueNextRetry = Próximo reintento
+WhatsappQueueSentDate = Fecha de envío
+WhatsappQueueSource = Módulo de origen
+WhatsappQueueProcessingDate = Fecha de procesamiento
+WhatsappQueueMaxRetries = Máx. reintentos
+WhatsappQueueMaxRetriesHelp = Máximo de reintentos para este mensaje. Vacío = usar el valor global de configuración.
+WhatsappQueueTest = Encolar mensajes de prueba
+WhatsappQueueTestHelp = Encola un mensaje de prueba (texto o documento) para comprobar que la tarea programada de la cola lo envía. Recuerda activar la tarea "Procesar la cola de mensajes de WhatsApp".
+WhatsappQueueEnqueue = Encolar
+WhatsappQueueEnqueuedOk = Mensaje encolado correctamente (ref. #%s)
+WhatsappQueueEnqueuedKo = No se pudo encolar el mensaje
+WhatsappQueueUploadFailed = Error al subir el fichero
+WhatsappEnqueueSend = Encolar en lugar de enviar ahora
+WhatsappEnqueueSendTooltip = En vez de enviar al instante, el mensaje (y los PDF adjuntos) se añaden a la cola y se envían de forma escalonada mediante la tarea programada.
+WhatsappMessagesQueued = %s elemento(s) añadido(s) a la cola de WhatsApp
+WHATSAPP_DEFAULT_COUNTRY_CODE = Prefijo de país por defecto
+WHATSAPP_DEFAULT_COUNTRY_CODETooltip = Código de país (sin "+") que se añade a los números que no incluyen prefijo internacional, al normalizar el teléfono antes de enviar. Por defecto 34 (España).
+WHATSAPP_REMINDER_MAX_RETRIES = Reintentos de recordatorios
+WHATSAPP_REMINDER_MAX_RETRIESTooltip = Número de reintentos de los recordatorios programados de WhatsApp que fallaron, antes de dejar de intentarlo. Por defecto 3.
+WHATSAPP_COMBINE_TEXT_WITH_DOC = Combinar texto y documento en un mensaje
+WHATSAPP_COMBINE_TEXT_WITH_DOCTooltip = Al enviar un documento (PDF/imagen/vídeo) junto con texto, envía el texto (asunto + cuerpo) como pie de foto (caption) del documento en un único mensaje, en lugar de dos mensajes separados. Aplica tanto al envío directo como al encolado. Si el texto supera 1024 caracteres se envía por separado.
+WhatsappQueueSettings = Cola de mensajería WhatsApp
+WHATSAPP_QUEUE_MAX_RETRIES = Reintentos máximos
+WHATSAPP_QUEUE_MAX_RETRIESTooltip = Número de reintentos ante errores temporales (red, timeout, 5xx, 429) antes de marcar el mensaje como Fallido y dejarlo fuera de la cola. Los errores permanentes (número inválido, 4xx, fichero inexistente) no reintentan. Por defecto 3.
+WHATSAPP_QUEUE_BACKOFF_SECONDS = Backoff entre reintentos (segundos)
+WHATSAPP_QUEUE_BACKOFF_SECONDSTooltip = Segundos de espera base entre reintentos, multiplicados por el número de reintento (reintento 1 = 1×, reintento 2 = 2×...). Por defecto 300.
+WHATSAPP_QUEUE_MAX_PER_RUN = Mensajes por ejecución (N)
+WHATSAPP_QUEUE_MAX_PER_RUNTooltip = Número máximo de mensajes que envía cada ejecución del cron. Lo sobreescribe el 1er parámetro de la tarea programada si se indica. Por defecto 1.
+WHATSAPP_QUEUE_WINDOW_SECONDS = Ventana entre lotes (segundos)
+WHATSAPP_QUEUE_WINDOW_SECONDSTooltip = Segundos mínimos entre lotes de envío. Lo sobreescribe el 2º parámetro de la tarea programada si se indica. Por defecto 150.
+WHATSAPP_QUEUE_JITTER_SECONDS = Jitter (segundos)
+WHATSAPP_QUEUE_JITTER_SECONDSTooltip = Segundos aleatorios añadidos a la ventana para un patrón de envío más natural. Lo sobreescribe el 3er parámetro de la tarea programada si se indica. Por defecto 30.
+WHATSAPP_FORCE_QUEUE = Encolar los recordatorios
+WHATSAPP_FORCE_QUEUETooltip = Si se activa, los recordatorios de WhatsApp se encolan en lugar de enviarse al instante, quedando sujetos a la cadencia de la cola.

@@ -349,3 +349,77 @@ WhatsappScheduleViewLog = Visualizza log webhook
 WhatsappScheduleClickToEditDate = Clicca per modificare la data
 WhatsappScheduleEditDateTitle = Modifica data di invio
 WhatsappScheduleCannotEditDate = Solo le date in sospeso o disattivate possono essere modificate
+
+#
+# Message queue
+#
+CronjobWhatsappProcessQueue = Elabora la coda di messaggi WhatsApp
+CronjobWhatsappProcessQueueComment = Invia i messaggi della coda WhatsApp in modo scaglionato per evitare di essere contrassegnato come SPAM. La cadenza (messaggi per esecuzione, finestra e jitter) e i tentativi si configurano nella configurazione del modulo, sezione "Coda di messaggi". Lascia vuoti i parametri di questa attività per usare tale configurazione. Facoltativamente puoi forzare la cadenza con parametri posizionali: maxToSend, windowSeconds, jitterSeconds (es. "1, 150, 30").
+WhatsappQueue = Coda WhatsApp
+WhatsappQueueList = Coda di messaggi WhatsApp
+WhatsappQueueMessage = Messaggio in coda
+WhatsappQueueSummary = Riepilogo della coda
+WhatsappQueueRequeue = Rimetti in coda
+WhatsappQueueCancel = Annulla
+WhatsappQueueRequeued = Messaggio rimesso in coda con successo
+WhatsappQueueCancelled = Messaggio annullato
+WhatsappQueueNotRequeable = Il messaggio non può essere rimesso in coda nel suo stato attuale
+WhatsappQueueNotCancellable = Il messaggio non può essere annullato nel suo stato attuale
+WhatsappQueueConfirmDelete = Sei sicuro di voler eliminare questo messaggio dalla coda?
+WhatsappQueueRecordsUpdated = %s record aggiornati
+WhatsappQueueNoRecordUpdated = Nessun record aggiornato
+WhatsappQueueStatusPending = In coda
+WhatsappQueueStatusProcessing = In elaborazione
+WhatsappQueueStatusSent = Inviato
+WhatsappQueueStatusError = Nuovo tentativo
+WhatsappQueueStatusFailed = Fallito
+WhatsappQueueStatusCancelled = Annullato
+WhatsappQueueType = Tipo
+WhatsappQueueTypeText = Testo
+WhatsappQueueTypeDocument = Documento
+WhatsappQueueTypeAudio = Audio
+WhatsappQueuePhone = Telefono
+WhatsappQueueRecipient = Destinatario
+WhatsappQueueContent = Contenuto
+WhatsappQueueFile = File
+WhatsappQueueFilePath = Percorso del file
+WhatsappQueueMediaType = Tipo di media
+WhatsappQueueScheduled = Programmato per
+WhatsappQueueScheduledHelp = Il messaggio non verrà inviato prima di questa data. Vuoto = invia il prima possibile.
+WhatsappQueueRetries = Tentativi
+WhatsappQueueLastError = Ultimo errore
+WhatsappQueueHttpCode = Codice HTTP
+WhatsappQueueNextRetry = Prossimo tentativo
+WhatsappQueueSentDate = Data di invio
+WhatsappQueueSource = Modulo di origine
+WhatsappQueueProcessingDate = Data di elaborazione
+WhatsappQueueMaxRetries = Tentativi max.
+WhatsappQueueMaxRetriesHelp = Numero massimo di tentativi per questo messaggio. Vuoto = usa il valore globale di configurazione.
+WhatsappQueueTest = Metti in coda messaggi di prova
+WhatsappQueueTestHelp = Metti in coda un messaggio di prova (testo o documento) per verificare che l'attività pianificata della coda lo consegni. Ricorda di attivare l'attività cron "Elabora la coda di messaggi WhatsApp".
+WhatsappQueueEnqueue = Metti in coda
+WhatsappQueueEnqueuedOk = Messaggio messo in coda con successo (rif. #%s)
+WhatsappQueueEnqueuedKo = Impossibile mettere in coda il messaggio
+WhatsappQueueUploadFailed = Caricamento del file non riuscito
+WhatsappEnqueueSend = Metti in coda invece di inviare ora
+WhatsappEnqueueSendTooltip = Invece di inviare immediatamente, il messaggio (e i PDF allegati) vengono aggiunti alla coda e consegnati in modo scaglionato dall'attività pianificata.
+WhatsappMessagesQueued = %s elemento/i aggiunto/i alla coda WhatsApp
+WHATSAPP_DEFAULT_COUNTRY_CODE = Prefisso internazionale predefinito
+WHATSAPP_DEFAULT_COUNTRY_CODETooltip = Prefisso internazionale (senza "+") anteposto ai numeri senza prefisso internazionale, durante la normalizzazione del telefono prima dell'invio. Predefinito 34 (Spagna).
+WHATSAPP_REMINDER_MAX_RETRIES = Tentativi dei promemoria
+WHATSAPP_REMINDER_MAX_RETRIESTooltip = Numero di tentativi per i promemoria WhatsApp pianificati falliti prima di rinunciare. Predefinito 3.
+WHATSAPP_COMBINE_TEXT_WITH_DOC = Combina testo e documento in un unico messaggio
+WHATSAPP_COMBINE_TEXT_WITH_DOCTooltip = Quando si invia un documento (PDF/immagine/video) insieme al testo, invia il testo (oggetto + corpo) come didascalia del documento in un unico messaggio invece di due messaggi separati. Si applica sia all'invio diretto sia alla coda. Se il testo supera i 1024 caratteri viene inviato separatamente.
+WhatsappQueueSettings = Coda di messaggi WhatsApp
+WHATSAPP_QUEUE_MAX_RETRIES = Tentativi max.
+WHATSAPP_QUEUE_MAX_RETRIESTooltip = Numero di tentativi in caso di errori temporanei (rete, timeout, 5xx, 429) prima che il messaggio sia contrassegnato come Fallito e rimosso dalla coda. Gli errori permanenti (numero non valido, 4xx, file mancante) non vengono ritentati. Predefinito 3.
+WHATSAPP_QUEUE_BACKOFF_SECONDS = Backoff tra tentativi (secondi)
+WHATSAPP_QUEUE_BACKOFF_SECONDSTooltip = Secondi base di attesa tra i tentativi, moltiplicati per il numero del tentativo (tentativo 1 = 1x, tentativo 2 = 2x...). Predefinito 300.
+WHATSAPP_QUEUE_MAX_PER_RUN = Messaggi per esecuzione (N)
+WHATSAPP_QUEUE_MAX_PER_RUNTooltip = Numero massimo di messaggi inviati a ogni esecuzione del cron. Sovrascritto dal 1° parametro dell'attività pianificata se fornito. Predefinito 1.
+WHATSAPP_QUEUE_WINDOW_SECONDS = Finestra tra i lotti (secondi)
+WHATSAPP_QUEUE_WINDOW_SECONDSTooltip = Secondi minimi tra i lotti di invio. Sovrascritto dal 2° parametro dell'attività pianificata se fornito. Predefinito 150.
+WHATSAPP_QUEUE_JITTER_SECONDS = Jitter (secondi)
+WHATSAPP_QUEUE_JITTER_SECONDSTooltip = Secondi casuali aggiunti alla finestra per un modello di invio più naturale. Sovrascritto dal 3° parametro dell'attività pianificata se fornito. Predefinito 30.
+WHATSAPP_FORCE_QUEUE = Metti in coda i promemoria
+WHATSAPP_FORCE_QUEUETooltip = Se attivato, i promemoria WhatsApp vengono messi in coda invece di essere inviati immediatamente, soggetti alla cadenza della coda.

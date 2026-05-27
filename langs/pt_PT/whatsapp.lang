@@ -347,3 +347,77 @@ WhatsappScheduleViewLog = Ver log de webhook
 WhatsappScheduleClickToEditDate = Clique para editar data
 WhatsappScheduleEditDateTitle = Editar data de envio
 WhatsappScheduleCannotEditDate = Apenas datas pendentes ou desativadas podem ser editadas
+
+#
+# Message queue
+#
+CronjobWhatsappProcessQueue = Processar a fila de mensagens WhatsApp
+CronjobWhatsappProcessQueueComment = Envia as mensagens da fila WhatsApp de forma escalonada para evitar ser marcado como SPAM. A cadência (mensagens por execução, janela e jitter) e as tentativas configuram-se na configuração do módulo, secção "Fila de mensagens". Deixe os parâmetros desta tarefa vazios para usar essa configuração. Opcionalmente pode forçar a cadência com parâmetros posicionais: maxToSend, windowSeconds, jitterSeconds (ex.: "1, 150, 30").
+WhatsappQueue = Fila WhatsApp
+WhatsappQueueList = Fila de mensagens WhatsApp
+WhatsappQueueMessage = Mensagem em fila
+WhatsappQueueSummary = Resumo da fila
+WhatsappQueueRequeue = Recolocar na fila
+WhatsappQueueCancel = Cancelar
+WhatsappQueueRequeued = Mensagem recolocada na fila com sucesso
+WhatsappQueueCancelled = Mensagem cancelada
+WhatsappQueueNotRequeable = A mensagem não pode ser recolocada na fila no seu estado atual
+WhatsappQueueNotCancellable = A mensagem não pode ser cancelada no seu estado atual
+WhatsappQueueConfirmDelete = Tem a certeza de que deseja eliminar esta mensagem da fila?
+WhatsappQueueRecordsUpdated = %s registo(s) atualizado(s)
+WhatsappQueueNoRecordUpdated = Nenhum registo foi atualizado
+WhatsappQueueStatusPending = Em fila
+WhatsappQueueStatusProcessing = A processar
+WhatsappQueueStatusSent = Enviado
+WhatsappQueueStatusError = A repetir
+WhatsappQueueStatusFailed = Falhado
+WhatsappQueueStatusCancelled = Cancelado
+WhatsappQueueType = Tipo
+WhatsappQueueTypeText = Texto
+WhatsappQueueTypeDocument = Documento
+WhatsappQueueTypeAudio = Áudio
+WhatsappQueuePhone = Telefone
+WhatsappQueueRecipient = Destinatário
+WhatsappQueueContent = Conteúdo
+WhatsappQueueFile = Ficheiro
+WhatsappQueueFilePath = Caminho do ficheiro
+WhatsappQueueMediaType = Tipo de média
+WhatsappQueueScheduled = Agendado para
+WhatsappQueueScheduledHelp = A mensagem não será enviada antes desta data. Vazio = enviar assim que possível.
+WhatsappQueueRetries = Tentativas
+WhatsappQueueLastError = Último erro
+WhatsappQueueHttpCode = Código HTTP
+WhatsappQueueNextRetry = Próxima tentativa
+WhatsappQueueSentDate = Data de envio
+WhatsappQueueSource = Módulo de origem
+WhatsappQueueProcessingDate = Data de processamento
+WhatsappQueueMaxRetries = Máx. tentativas
+WhatsappQueueMaxRetriesHelp = Número máximo de tentativas para esta mensagem. Vazio = usar o valor global de configuração.
+WhatsappQueueTest = Colocar em fila mensagens de teste
+WhatsappQueueTestHelp = Coloque em fila uma mensagem de teste (texto ou documento) para verificar que a tarefa agendada da fila a entrega. Lembre-se de ativar a tarefa cron "Processar a fila de mensagens WhatsApp".
+WhatsappQueueEnqueue = Colocar em fila
+WhatsappQueueEnqueuedOk = Mensagem colocada em fila com sucesso (ref. #%s)
+WhatsappQueueEnqueuedKo = Não foi possível colocar a mensagem em fila
+WhatsappQueueUploadFailed = Falha no carregamento do ficheiro
+WhatsappEnqueueSend = Colocar em fila em vez de enviar agora
+WhatsappEnqueueSendTooltip = Em vez de enviar de imediato, a mensagem (e os PDF anexados) são adicionados à fila e entregues de forma escalonada pela tarefa agendada.
+WhatsappMessagesQueued = %s item(s) adicionado(s) à fila WhatsApp
+WHATSAPP_DEFAULT_COUNTRY_CODE = Indicativo de país predefinido
+WHATSAPP_DEFAULT_COUNTRY_CODETooltip = Indicativo de país (sem "+") anteposto aos números sem prefixo internacional, ao normalizar o telefone antes do envio. Predefinido 34 (Espanha).
+WHATSAPP_REMINDER_MAX_RETRIES = Tentativas dos lembretes
+WHATSAPP_REMINDER_MAX_RETRIESTooltip = Número de tentativas para os lembretes WhatsApp agendados falhados antes de desistir. Predefinido 3.
+WHATSAPP_COMBINE_TEXT_WITH_DOC = Combinar texto e documento numa só mensagem
+WHATSAPP_COMBINE_TEXT_WITH_DOCTooltip = Ao enviar um documento (PDF/imagem/vídeo) juntamente com texto, envia o texto (assunto + corpo) como legenda do documento numa única mensagem, em vez de duas mensagens separadas. Aplica-se ao envio direto e à fila. Se o texto exceder 1024 caracteres é enviado separadamente.
+WhatsappQueueSettings = Fila de mensagens WhatsApp
+WHATSAPP_QUEUE_MAX_RETRIES = Máx. tentativas
+WHATSAPP_QUEUE_MAX_RETRIESTooltip = Número de tentativas em erros temporários (rede, timeout, 5xx, 429) antes de a mensagem ser marcada como Falhada e removida da fila. Os erros permanentes (número inválido, 4xx, ficheiro em falta) não são repetidos. Predefinido 3.
+WHATSAPP_QUEUE_BACKOFF_SECONDS = Backoff entre tentativas (segundos)
+WHATSAPP_QUEUE_BACKOFF_SECONDSTooltip = Segundos base de espera entre tentativas, multiplicados pelo número da tentativa (tentativa 1 = 1x, tentativa 2 = 2x...). Predefinido 300.
+WHATSAPP_QUEUE_MAX_PER_RUN = Mensagens por execução (N)
+WHATSAPP_QUEUE_MAX_PER_RUNTooltip = Número máximo de mensagens enviadas em cada execução do cron. Substituído pelo 1.º parâmetro da tarefa agendada se fornecido. Predefinido 1.
+WHATSAPP_QUEUE_WINDOW_SECONDS = Janela entre lotes (segundos)
+WHATSAPP_QUEUE_WINDOW_SECONDSTooltip = Segundos mínimos entre lotes de envio. Substituído pelo 2.º parâmetro da tarefa agendada se fornecido. Predefinido 150.
+WHATSAPP_QUEUE_JITTER_SECONDS = Jitter (segundos)
+WHATSAPP_QUEUE_JITTER_SECONDSTooltip = Segundos aleatórios adicionados à janela para um padrão de envio mais natural. Substituído pelo 3.º parâmetro da tarefa agendada se fornecido. Predefinido 30.
+WHATSAPP_FORCE_QUEUE = Colocar em fila os lembretes
+WHATSAPP_FORCE_QUEUETooltip = Se ativado, os lembretes WhatsApp são colocados em fila em vez de enviados de imediato, sujeitos à cadência da fila.
