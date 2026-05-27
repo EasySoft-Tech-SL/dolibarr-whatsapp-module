@@ -1,5 +1,68 @@
 # CHANGELOG WHATSAPP FOR [DOLIBARR ERP CRM](https://www.dolibarr.org)
 
+## [1.9] - 2026-05-27
+
+### ✨ Nueva Funcionalidad: Cola de mensajería con envío escalonado (anti-SPAM)
+
+- **📨 Cola de mensajes WhatsApp**: Nueva tabla `llx_whatsapp_message_queue` y modelo `WhatsappQueue` para encolar envíos (texto, documento/PDF/imagen/vídeo y audio/nota de voz) y entregarlos de forma escalonada, evitando que la conexión Baileys sea marcada como SPAM al enviar muchos mensajes.
+- **⏱️ Cadencia configurable "N cada X"**: Nueva tarea programada `processQueue(maxToSend, windowSeconds, jitterSeconds)`. Una guarda interna (`WHATSAPP_QUEUE_LAST_SENT`) garantiza que solo se envía un lote de **N** mensajes cada **X** segundos aunque el cron se ejecute más a menudo, con *jitter* aleatorio opcional para un patrón más humano. Configurable por parámetros del cron y/o por constantes de configuración.
+- **🔌 API reutilizable desde otros módulos**: Métodos estáticos `WhatsappQueue::enqueueText()`, `enqueueDocument()` y `enqueueAudio()` para encolar mensajes desde este módulo o desde cualquier otro módulo de Dolibarr.
+- **🛡️ Control de errores robusto**: Reclamación atómica (`claim()`) para evitar doble envío entre ejecuciones concurrentes; clasificación de errores **permanentes** (número inválido, HTTP 4xx, configuración faltante y **fichero inexistente en disco**) que se marcan como `Fallido` sin reintentar, frente a errores **temporales** (CURL, timeout, HTTP 5xx, 429) que se reintentan con *backoff* hasta `WHATSAPP_QUEUE_MAX_RETRIES`.
+- **📁 Verificación de ficheros**: Antes de enviar audio/documentos se comprueba que el fichero exista y sea legible en disco; si no, se marca como fallo permanente para no reintentar indefinidamente.
+- **🖥️ Menú y pantallas de gestión** (en *Utilidades*): Listado con panel de contadores por estado (En cola, Procesando, Reintentando, Fallido, Enviado, Cancelado), filtros, y acciones masivas de **reencolar / cancelar / eliminar**. Ficha de detalle con el último error, código HTTP, reintentos y botones de acción.
+- **🔁 Modo cola opcional para recordatorios**: Nueva constante `WHATSAPP_FORCE_QUEUE` que, si se activa, hace que los recordatorios de WhatsApp pasen por la cola en lugar de enviarse inmediatamente.
+- **☑️ Casilla "Encolar" en el formulario de envío** de las fichas (terceros, facturas, pedidos, etc.): permite añadir el mensaje a la cola en lugar de enviarlo al instante.
+- **📎 Texto + documento en un solo mensaje**: cuando se envía un documento (PDF/imagen/vídeo) junto con texto, el texto (asunto + cuerpo) viaja como pie de foto (*caption*) del documento, en un único mensaje, tanto en envío directo como encolado. Configurable y con límite de seguridad de 1024 caracteres.
+- **🧪 Encolar mensajes de prueba desde la configuración**: nueva zona en el setup para encolar un texto o subir un documento de prueba y validar la tarea programada.
+- **⚙️ Configuración completa desde el setup**: cadencia (N / ventana / jitter), reintentos, backoff, prefijo de país, reintentos de recordatorios, combinar texto+documento y encolar recordatorios.
+- **📝 Mensajes de error de encolado descriptivos**: si falla el encolado se muestra el motivo real (antes solo un mensaje genérico).
+
+### 🗄️ Cambios en Base de Datos
+- **Nueva tabla `llx_whatsapp_message_queue`** (charset **utf8mb4** para soportar emojis) con índices, incluido un índice compuesto `(status, date_scheduled, next_retry_date)` para la selección eficiente de los próximos mensajes a enviar.
+
+### 🔐 Permisos
+- **3 nuevos permisos**: `queue` → leer / escribir / eliminar.
+
+### ⚙️ Nuevas Constantes de Configuración
+- `WHATSAPP_QUEUE_MAX_PER_RUN` (N por ejecución, def. `1`)
+- `WHATSAPP_QUEUE_WINDOW_SECONDS` (ventana X en segundos, def. `150`)
+- `WHATSAPP_QUEUE_JITTER_SECONDS` (jitter, def. `30`)
+- `WHATSAPP_QUEUE_MAX_RETRIES` (reintentos, def. `3`)
+- `WHATSAPP_QUEUE_BACKOFF_SECONDS` (backoff base, def. `300`)
+- `WHATSAPP_FORCE_QUEUE` (encolar recordatorios, def. desactivado)
+- `WHATSAPP_DEFAULT_COUNTRY_CODE` (prefijo de país para normalizar teléfonos, def. `34`)
+- `WHATSAPP_REMINDER_MAX_RETRIES` (reintentos de recordatorios, def. `3`)
+- `WHATSAPP_COMBINE_TEXT_WITH_DOC` (texto como caption del documento, def. activado)
+- Todas configurables desde *Configuración del módulo*.
+
+### 🌐 Traducciones
+- **70 nuevas claves** (cola + configuración) añadidas en los 6 idiomas (ES, EN, FR, DE, IT, PT).
+
+### 📝 Archivos Creados
+- `sql/llx_whatsapp_message_queue.sql` – Definición de la tabla de la cola
+- `sql/llx_whatsapp_message_queue.key.sql` – Índices de la cola
+- `class/whatsappqueue.class.php` – Modelo CRUD + API estática de encolado + helpers de procesamiento
+- `lib/whatsapp_messagequeue.lib.php` – Tabs de la ficha
+- `messagequeue_list.php` – Listado con panel de contadores (tarjetas) y acciones masivas
+- `messagequeue_card.php` – Ficha de detalle con acciones
+- `docs/cola-mensajeria.md` – Guía de uso de la cola y de encolado desde otros módulos
+
+### 📝 Archivos Modificados
+- `core/modules/modWhatsapp.class.php` – Versión 1.9, nueva tarea cron `processQueue` (desactivada por defecto, sin parámetros para usar la config), permisos `queue`, menú en *Utilidades* y constantes
+- `class/whatsapputils.class.php` – Método cron `processQueue()`, despachador por tipo con verificación de fichero y *caption*, y soporte de `WHATSAPP_FORCE_QUEUE`
+- `class/actions_whatsapp.class.php` – Casilla "Encolar" en el formulario, combinación texto+documento (caption) en envío directo y encolado
+- `class/whatsappqueue.class.php` – Mejora de `normalizePhone()` (evita duplicar el prefijo de país) y captura del error real de encolado
+- `lib/whatsapp.lib.php` – Nuevas funciones `whatsappApiPost()` (transporte con resultado estructurado) y `whatsappIsPermanentError()` (clasificación de errores)
+- `admin/setup.php` – Zona de encolado de prueba y nuevos ajustes de la cola/envío
+- `langs/{es_ES,en_US,fr_FR,de_DE,it_IT,pt_PT}/whatsapp.lang` – Nuevas claves de la cola y de configuración (6 idiomas)
+- `README.md` – Sección de la cola, parámetros y API de encolado
+
+⚠️ **Nota de instalación**: Requiere desactivar y reactivar el módulo para crear la tabla SQL, los permisos, el menú y la tarea cron. La tarea de la cola se instala **desactivada**: actívala y ajusta sus parámetros antes de usarla.
+
+⚠️ **Charset (upgraders)**: la tabla de la cola usa **utf8mb4** (necesario para emojis). En instalaciones nuevas se crea correctamente. Si por una preversión la tabla quedó en otro charset, ejecuta una vez: `ALTER TABLE llx_whatsapp_message_queue CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;`
+
+---
+
 ## [1.8] - 2026-05-04
 
 ### ⚡ Mejoras de rendimiento

@@ -72,7 +72,7 @@ class modWhatsapp extends DolibarrModules
 		$this->editor_url = 'https://www.easysoft.es';
 
 		// Possible values for version are: 'development', 'experimental', 'dolibarr', 'dolibarr_deprecated' or a version string like 'x.y.z'
-		$this->version = '1.8';
+		$this->version = '1.9';
 		// Url to the file with your last numberversion of this module
 		//$this->url_last_version = 'http://www.example.com/versionmodule.txt';
 
@@ -149,6 +149,10 @@ class modWhatsapp extends DolibarrModules
 
 		// The language file dedicated to your module
 		$this->langfiles = array("whatsapp@whatsapp");
+		// Load it now so $langs->trans() used below (e.g. cron comments) resolves the keys
+		if (is_object($langs)) {
+			$langs->load("whatsapp@whatsapp");
+		}
 
 		// Prerequisites
 		$this->phpmin = array(5, 6); // Minimum version of PHP required by module
@@ -171,6 +175,16 @@ class modWhatsapp extends DolibarrModules
 			3 => array('MAIN_AGENDA_ACTIONAUTO_SEND_WHATSAPP_PDF', 'chaine', '1', 'This is a constant to add', 1),
 			4 => array('WHATSAPP_SERVER_URL', 'chaine', 'https://newwhapi.easysoft.es', 'URL of the Whatsapp API server', 1, 'current', 0),
 			5 => array('AGENDA_USE_EVENT_TYPE', 'chaine', '1', '', 0, 'current', 0),
+			// Message queue (anti-SPAM throttling) defaults. Can be overridden by cron parameters.
+			6 => array('WHATSAPP_QUEUE_MAX_PER_RUN', 'chaine', '1', 'Max WhatsApp messages sent per queue run (N)', 0, 'current', 0),
+			7 => array('WHATSAPP_QUEUE_WINDOW_SECONDS', 'chaine', '150', 'Minimum seconds between queue batches (X)', 0, 'current', 0),
+			8 => array('WHATSAPP_QUEUE_JITTER_SECONDS', 'chaine', '30', 'Random extra seconds added to the queue window', 0, 'current', 0),
+			9 => array('WHATSAPP_QUEUE_MAX_RETRIES', 'chaine', '3', 'Max retries for a transient send error before giving up', 0, 'current', 0),
+			10 => array('WHATSAPP_QUEUE_BACKOFF_SECONDS', 'chaine', '300', 'Base backoff seconds between retries (multiplied by retry number)', 0, 'current', 0),
+			11 => array('WHATSAPP_FORCE_QUEUE', 'chaine', '0', 'Route WhatsApp reminders through the queue instead of sending them immediately', 0, 'current', 0),
+			12 => array('WHATSAPP_DEFAULT_COUNTRY_CODE', 'chaine', '34', 'Default country code (without +) used to normalize phone numbers', 0, 'current', 0),
+			13 => array('WHATSAPP_REMINDER_MAX_RETRIES', 'chaine', '3', 'Max retries for failed scheduled WhatsApp reminders', 0, 'current', 0),
+			14 => array('WHATSAPP_COMBINE_TEXT_WITH_DOC', 'chaine', '1', 'Send the message text as the caption of the document (one message) instead of two separate messages', 0, 'current', 0),
 		);
 
 		// Some keys to add into the overwriting translation tables
@@ -268,6 +282,23 @@ class modWhatsapp extends DolibarrModules
 				'test' => '$conf->whatsapp->enabled',
 				'priority' => 1,
 			),
+			1 => array(
+				'label' => 'CronjobWhatsappProcessQueue',
+				'jobtype' => 'method',
+				'class' => '/whatsapp/class/whatsapputils.class.php',
+				'objectname' => 'WhatsappUtils',
+				'method' => 'processQueue',
+				// Cadence is configured from the module setup (Queue settings). Parameters are left
+				// empty on purpose so processQueue() reads the constants. They remain an optional override.
+				'parameters' => '',
+				// Store the translated text (the cron page does not load the module lang file, so a raw key would show)
+				'comment' => $langs->trans('CronjobWhatsappProcessQueueComment'),
+				'frequency' => 1,
+				'unitfrequency' => 60,
+				'status' => 0,
+				'test' => '$conf->whatsapp->enabled',
+				'priority' => 2,
+			),
 		);
 		// Example: $this->cronjobs=array(
 		//    0=>array('label'=>'My label', 'jobtype'=>'method', 'class'=>'/dir/class/file.class.php', 'objectname'=>'MyClass', 'method'=>'myMethod', 'parameters'=>'param1, param2', 'comment'=>'Comment', 'frequency'=>2, 'unitfrequency'=>3600, 'status'=>0, 'test'=>'$conf->whatsapp->enabled', 'priority'=>50),
@@ -323,6 +354,24 @@ class modWhatsapp extends DolibarrModules
 		$this->rights[$r][1] = 'WHATSAPP_RIGHT_WEBHOOKLOG_DELETE'; // Permission label
 		$this->rights[$r][3] = 0;
 		$this->rights[$r][4] = 'webhooklog';
+		$this->rights[$r][5] = 'delete';
+		$r++;
+		$this->rights[$r][0] = $this->numero . sprintf("%02d", $r + 1); // Permission id (must not be already used)
+		$this->rights[$r][1] = 'WHATSAPP_RIGHT_QUEUE_READ'; // Permission label
+		$this->rights[$r][3] = 0;
+		$this->rights[$r][4] = 'queue';
+		$this->rights[$r][5] = 'read';
+		$r++;
+		$this->rights[$r][0] = $this->numero . sprintf("%02d", $r + 1); // Permission id (must not be already used)
+		$this->rights[$r][1] = 'WHATSAPP_RIGHT_QUEUE_WRITE'; // Permission label
+		$this->rights[$r][3] = 0;
+		$this->rights[$r][4] = 'queue';
+		$this->rights[$r][5] = 'write';
+		$r++;
+		$this->rights[$r][0] = $this->numero . sprintf("%02d", $r + 1); // Permission id (must not be already used)
+		$this->rights[$r][1] = 'WHATSAPP_RIGHT_QUEUE_DELETE'; // Permission label
+		$this->rights[$r][3] = 0;
+		$this->rights[$r][4] = 'queue';
 		$this->rights[$r][5] = 'delete';
 		$r++;
 
@@ -447,6 +496,38 @@ class modWhatsapp extends DolibarrModules
 			'target' => '',
 			'user' => 2,				                // 0=Menu for internal users, 1=external users, 2=both
 		);
+
+		/* BEGIN MODULEBUILDER LEFTMENU MESSAGEQUEUE */
+		$this->menu[$r++] = array(
+			'fk_menu' => 'fk_mainmenu=tools',
+			'type' => 'left',
+			'titre' => 'WhatsappQueue',
+			'prefix' => img_picto('', $this->picto, 'class="paddingright pictofixedwidth valignmiddle"'),
+			'mainmenu' => 'tools',
+			'leftmenu' => 'whatsapp_messagequeue',
+			'langs' => 'whatsapp@whatsapp',
+			'position' => $basePosition + $r,
+			'enabled' => '$conf->whatsapp->enabled',
+			'perms' => '$user->rights->whatsapp->queue->read',
+			'target' => '',
+			'user' => 2,
+		);
+		$this->menu[$r++] = array(
+			'fk_menu' => 'fk_mainmenu=tools,fk_leftmenu=whatsapp_messagequeue',
+			'type' => 'left',
+			'titre' => 'WhatsappQueueList',
+			'mainmenu' => 'tools',
+			'leftmenu' => 'whatsapp_messagequeue_list',
+			'url' => '/whatsapp/messagequeue_list.php',
+			'langs' => 'whatsapp@whatsapp',
+			'position' => $basePosition + $r,
+			'enabled' => '$conf->whatsapp->enabled',
+			'perms' => '$user->rights->whatsapp->queue->read',
+			'target' => '',
+			'user' => 2,
+		);
+		/* END MODULEBUILDER LEFTMENU MESSAGEQUEUE */
+
 		/* $this->menu[$r++] = array(
 			'fk_menu' => 'fk_mainmenu=tools,fk_leftmenu=templates',	    // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
 			'type' => 'left',			                // This is a Left menu entry

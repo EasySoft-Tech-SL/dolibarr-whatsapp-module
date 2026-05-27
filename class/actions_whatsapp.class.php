@@ -162,6 +162,7 @@ class ActionsWhatsapp
 			$templateId = GETPOST('whatsapp_template', 'int');
 			$sendSubject = GETPOST('send_subject', 'alpha') == 'on';
 			$sendAsAudio = GETPOST('send_as_audio', 'alpha') == 'on';
+			$sendToQueue = GETPOST('send_to_queue', 'alpha') == 'on';
 			$whatsappPdfFiles = GETPOST('whatsapp_pdf_files', 'array');
 
 			// Validar que el número de WhatsApp no esté vacío
@@ -241,8 +242,92 @@ class ActionsWhatsapp
 					2- Si no tiene asunto se envia un mensaje normal
 		*/
 
+			// === Encolar en lugar de enviar al instante ===
+			if ($sendToQueue) {
+				dol_include_once('/whatsapp/class/whatsappqueue.class.php');
+
+				$queueOpts = array('source_module' => 'whatsapp:' . $object->element);
+				if (!empty($object->socid)) {
+					$queueOpts['fk_soc'] = (int) $object->socid;
+				} elseif (!empty($object->fk_soc)) {
+					$queueOpts['fk_soc'] = (int) $object->fk_soc;
+				}
+				if (empty($object->thirdparty) && method_exists($object, 'fetch_thirdparty')) {
+					$object->fetch_thirdparty();
+				}
+				if (!empty($object->thirdparty) && !empty($object->thirdparty->name)) {
+					$queueOpts['recipient_name'] = $object->thirdparty->name;
+				}
+
+				$nbQueued = 0;
+
+				// Mensaje principal (texto o audio). El asunto se combina con el cuerpo.
+				$finalMessage = $contenttosend;
+				if ($sendSubject && !empty($subjecttosend)) {
+					$finalMessage = "*Asunto:* " . $subjecttosend . "\n\n" . $contenttosend;
+				}
+
+				// Combinar texto + documento en un solo mensaje (caption) si está activado y cabe
+				$msgLen = function_exists('mb_strlen') ? mb_strlen($finalMessage) : strlen($finalMessage);
+				$combineEnabled = !isset($conf->global->WHATSAPP_COMBINE_TEXT_WITH_DOC) || !empty($conf->global->WHATSAPP_COMBINE_TEXT_WITH_DOC);
+				$combineTextIntoDoc = ($combineEnabled && !$sendAsAudio && count($pdfOK) > 0 && trim($finalMessage) !== '' && $msgLen <= 1024);
+
+				if ($sendAsAudio) {
+					dol_include_once('/whatsapp/includes/TextToSpeech.php');
+					$text = htmlToPlainText($contenttosend);
+					$spoolDir = WhatsappQueue::getSpoolDir();
+					if (!is_dir($spoolDir)) {
+						dol_mkdir($spoolDir);
+					}
+					$audioFile = $spoolDir . '/AUDIO' . dol_now() . '_' . substr(md5(uniqid('', true)), 0, 6) . '.mp3';
+					$ttsOptions = array('voice' => 'es-ES', 'speed' => 1);
+					if (TextToSpeech::googleTranslateTTSLong($text, 'es', $audioFile, $ttsOptions, false) && file_exists($audioFile)) {
+						if (WhatsappQueue::enqueueAudio($whatsappNumber, $audioFile, $text, $queueOpts) > 0) {
+							$nbQueued++;
+						}
+					} elseif (WhatsappQueue::enqueueText($whatsappNumber, $finalMessage, $queueOpts) > 0) {
+						// Si falla la generación de audio, encolamos el texto
+						$nbQueued++;
+					}
+				} elseif (!$combineTextIntoDoc) {
+					// Solo enviamos texto aparte cuando NO se combina con el documento
+					if (WhatsappQueue::enqueueText($whatsappNumber, $finalMessage, $queueOpts) > 0) {
+						$nbQueued++;
+					}
+				}
+
+				// Documentos PDF: snapshot a spool para que no dependan del fichero vivo (factura regenerada/borrada).
+				// Si se combina, el texto (asunto+cuerpo) va como caption del primer documento.
+				$firstDoc = true;
+				foreach ($pdfOK as $file) {
+					$docCaption = ($combineTextIntoDoc && $firstDoc) ? $finalMessage : '';
+					// Usamos la ruta real del documento (no se clona). Si el fichero ya no existe
+					// al enviar, processQueue lo marca como fallo permanente (sin reintentos en bucle).
+					if (WhatsappQueue::enqueueDocument($whatsappNumber, $file, basename($file), 'document', $docCaption, $queueOpts) > 0) {
+						$nbQueued++;
+					}
+					$firstDoc = false;
+				}
+
+				if ($nbQueued > 0) {
+					setEventMessages($langs->trans('WhatsappMessagesQueued', $nbQueued), null, 'mesgs');
+				} else {
+					$queueErr = $langs->trans('WhatsappQueueEnqueuedKo');
+					if (!empty(WhatsappQueue::$lastError)) {
+						$queueErr .= ': ' . WhatsappQueue::$lastError;
+					}
+					setEventMessages($queueErr, null, 'errors');
+				}
+
+				$url = $_SERVER['PHP_SELF'] . '?id=' . $object->id . '&token=' . newToken();
+				echo '<script type="text/javascript">window.location.href = "' . $url . '";</script>';
+				exit;
+			}
+
 			// Paso 1: Enviar el mensaje según el tipo seleccionado
 			$error = 0;
+			$finalMessage = '';
+			$combineTextIntoDoc = false; // si true, el texto viaja como caption del 1er documento (un solo mensaje)
 
 			// Comenzamos el envío
 			if ($sendAsAudio) {
@@ -295,21 +380,31 @@ class ActionsWhatsapp
 					$finalMessage = "*Asunto:* " . $subjecttosend . "\n\n" . $contenttosend;
 				}
 
-				// Enviamos un solo mensaje con la función simplificada
-				$messageResult = sendWhapiText(
-					$object,
-					$whatsappNumber,
-					$finalMessage
-				);
+				// Si está activado en la configuración y hay documentos, y el texto (asunto+cuerpo)
+				// cabe como caption (límite 1024), no enviamos un mensaje de texto aparte:
+				// el texto irá como caption del primer documento (todo en un mensaje).
+				$msgLen = function_exists('mb_strlen') ? mb_strlen($finalMessage) : strlen($finalMessage);
+				$combineEnabled = !isset($conf->global->WHATSAPP_COMBINE_TEXT_WITH_DOC) || !empty($conf->global->WHATSAPP_COMBINE_TEXT_WITH_DOC);
+				$combineTextIntoDoc = ($combineEnabled && count($pdfOK) > 0 && trim($finalMessage) !== '' && $msgLen <= 1024);
 
-				// La función sendWhapiText ya maneja los errores automáticamente
-				if (!$messageResult) {
-					$error++;
+				if (!$combineTextIntoDoc) {
+					// Enviamos un solo mensaje con la función simplificada
+					$messageResult = sendWhapiText(
+						$object,
+						$whatsappNumber,
+						$finalMessage
+					);
+
+					// La función sendWhapiText ya maneja los errores automáticamente
+					if (!$messageResult) {
+						$error++;
+					}
 				}
 			}
 
 			// Paso 3: Enviar los archivos PDF adjuntos
 			if (count($pdfOK) > 0 && !$error) {
+				$firstDoc = true;
 				foreach ($pdfOK as $file) {
 					// Convertir el archivo a base64
 					$fileContent = file_get_contents($file);
@@ -319,10 +414,11 @@ class ActionsWhatsapp
 					$fileName = basename($file);
 
 					// Opciones para el envío del PDF
-					$options = [
-						'fileName' => $fileName,
-						'caption' => $fileName // Podríamos usar el asunto como caption también
-					];
+					$options = array('fileName' => $fileName);
+					// El texto del formulario viaja como caption del primer documento (todo en un solo mensaje)
+					if ($combineTextIntoDoc && $firstDoc) {
+						$options['caption'] = $finalMessage;
+					}
 
 					// Enviar el PDF
 					$pdfResult = sendWhapiDocument(
@@ -333,6 +429,7 @@ class ActionsWhatsapp
 						'document',
 						$options
 					);
+					$firstDoc = false;
 				}
 			}
 
@@ -530,6 +627,7 @@ class ActionsWhatsapp
 				</div>
 				'),
 				array('type' => 'checkbox', 'label' => $form->textwithpicto($langs->trans('SendAsAudio'), $langs->trans('SendAsAudioTooltip')), 'value' => false, 'name' => 'send_as_audio'),
+				array('type' => 'checkbox', 'label' => $form->textwithpicto($langs->trans('WhatsappEnqueueSend'), $langs->trans('WhatsappEnqueueSendTooltip')), 'value' => false, 'name' => 'send_to_queue'),
 				(count($fileArray) > 0 ?
 					//select con los datos
 					array('type' => 'select', 'name' => 'whatsapp_pdf_files', 'label' => $langs->trans("IncludePDFFiles"), 'morecss' => 'minwidth500', 'values' => $fileArray, 'moreattr' => 'multiple')

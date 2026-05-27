@@ -348,3 +348,77 @@ WhatsappScheduleViewLog = Webhook-Log anzeigen
 WhatsappScheduleClickToEditDate = Klicken, um Datum zu bearbeiten
 WhatsappScheduleEditDateTitle = Versanddatum bearbeiten
 WhatsappScheduleCannotEditDate = Nur ausstehende oder deaktivierte Termine können bearbeitet werden
+
+#
+# Message queue
+#
+CronjobWhatsappProcessQueue = WhatsApp-Nachrichtenwarteschlange verarbeiten
+CronjobWhatsappProcessQueueComment = Sendet die Nachrichten der WhatsApp-Warteschlange gedrosselt, um nicht als SPAM markiert zu werden. Die Kadenz (Nachrichten pro Lauf, Fenster und Jitter) und die Wiederholungen werden in der Modulkonfiguration im Abschnitt "Nachrichtenwarteschlange" eingestellt. Lassen Sie die Parameter dieser Aufgabe leer, um diese Konfiguration zu verwenden. Optional können Sie die Kadenz mit Positionsparametern erzwingen: maxToSend, windowSeconds, jitterSeconds (z. B. "1, 150, 30").
+WhatsappQueue = WhatsApp-Warteschlange
+WhatsappQueueList = WhatsApp-Nachrichtenwarteschlange
+WhatsappQueueMessage = Nachricht in Warteschlange
+WhatsappQueueSummary = Warteschlangenübersicht
+WhatsappQueueRequeue = Erneut einreihen
+WhatsappQueueCancel = Abbrechen
+WhatsappQueueRequeued = Nachricht erfolgreich erneut eingereiht
+WhatsappQueueCancelled = Nachricht abgebrochen
+WhatsappQueueNotRequeable = Die Nachricht kann im aktuellen Status nicht erneut eingereiht werden
+WhatsappQueueNotCancellable = Die Nachricht kann im aktuellen Status nicht abgebrochen werden
+WhatsappQueueConfirmDelete = Möchten Sie diese Nachricht aus der Warteschlange wirklich löschen?
+WhatsappQueueRecordsUpdated = %s Datensatz/Datensätze aktualisiert
+WhatsappQueueNoRecordUpdated = Kein Datensatz wurde aktualisiert
+WhatsappQueueStatusPending = In Warteschlange
+WhatsappQueueStatusProcessing = Wird verarbeitet
+WhatsappQueueStatusSent = Gesendet
+WhatsappQueueStatusError = Wiederholung
+WhatsappQueueStatusFailed = Fehlgeschlagen
+WhatsappQueueStatusCancelled = Abgebrochen
+WhatsappQueueType = Typ
+WhatsappQueueTypeText = Text
+WhatsappQueueTypeDocument = Dokument
+WhatsappQueueTypeAudio = Audio
+WhatsappQueuePhone = Telefon
+WhatsappQueueRecipient = Empfänger
+WhatsappQueueContent = Inhalt
+WhatsappQueueFile = Datei
+WhatsappQueueFilePath = Dateipfad
+WhatsappQueueMediaType = Medientyp
+WhatsappQueueScheduled = Geplant für
+WhatsappQueueScheduledHelp = Die Nachricht wird nicht vor diesem Datum gesendet. Leer = so bald wie möglich senden.
+WhatsappQueueRetries = Wiederholungen
+WhatsappQueueLastError = Letzter Fehler
+WhatsappQueueHttpCode = HTTP-Code
+WhatsappQueueNextRetry = Nächste Wiederholung
+WhatsappQueueSentDate = Sendedatum
+WhatsappQueueSource = Quellmodul
+WhatsappQueueProcessingDate = Verarbeitungsdatum
+WhatsappQueueMaxRetries = Max. Wiederholungen
+WhatsappQueueMaxRetriesHelp = Maximale Wiederholungen für diese Nachricht. Leer = globalen Konfigurationswert verwenden.
+WhatsappQueueTest = Testnachrichten einreihen
+WhatsappQueueTestHelp = Reihen Sie eine Testnachricht (Text oder Dokument) ein, um zu prüfen, ob die geplante Aufgabe der Warteschlange sie zustellt. Denken Sie daran, die Cron-Aufgabe "WhatsApp-Nachrichtenwarteschlange verarbeiten" zu aktivieren.
+WhatsappQueueEnqueue = Einreihen
+WhatsappQueueEnqueuedOk = Nachricht erfolgreich eingereiht (Ref. #%s)
+WhatsappQueueEnqueuedKo = Nachricht konnte nicht eingereiht werden
+WhatsappQueueUploadFailed = Datei-Upload fehlgeschlagen
+WhatsappEnqueueSend = Einreihen statt jetzt senden
+WhatsappEnqueueSendTooltip = Statt sofort zu senden, werden die Nachricht (und angehängte PDFs) der Warteschlange hinzugefügt und von der geplanten Aufgabe gedrosselt zugestellt.
+WhatsappMessagesQueued = %s Element(e) zur WhatsApp-Warteschlange hinzugefügt
+WHATSAPP_DEFAULT_COUNTRY_CODE = Standard-Ländervorwahl
+WHATSAPP_DEFAULT_COUNTRY_CODETooltip = Ländervorwahl (ohne "+"), die Nummern ohne internationale Vorwahl beim Normalisieren vor dem Senden vorangestellt wird. Standard 34 (Spanien).
+WHATSAPP_REMINDER_MAX_RETRIES = Erinnerungs-Wiederholungen
+WHATSAPP_REMINDER_MAX_RETRIESTooltip = Anzahl der Wiederholungen für fehlgeschlagene geplante WhatsApp-Erinnerungen, bevor aufgegeben wird. Standard 3.
+WHATSAPP_COMBINE_TEXT_WITH_DOC = Text und Dokument in einer Nachricht kombinieren
+WHATSAPP_COMBINE_TEXT_WITH_DOCTooltip = Beim Senden eines Dokuments (PDF/Bild/Video) zusammen mit Text wird der Text (Betreff + Inhalt) als Bildunterschrift des Dokuments in einer einzigen Nachricht gesendet, anstatt in zwei getrennten Nachrichten. Gilt für Direktversand und Warteschlange. Ist der Text länger als 1024 Zeichen, wird er separat gesendet.
+WhatsappQueueSettings = WhatsApp-Nachrichtenwarteschlange
+WHATSAPP_QUEUE_MAX_RETRIES = Max. Wiederholungen
+WHATSAPP_QUEUE_MAX_RETRIESTooltip = Anzahl der Wiederholungen bei vorübergehenden Fehlern (Netzwerk, Timeout, 5xx, 429), bevor die Nachricht als Fehlgeschlagen markiert und aus der Warteschlange entfernt wird. Permanente Fehler (ungültige Nummer, 4xx, fehlende Datei) werden nicht wiederholt. Standard 3.
+WHATSAPP_QUEUE_BACKOFF_SECONDS = Backoff zwischen Wiederholungen (Sekunden)
+WHATSAPP_QUEUE_BACKOFF_SECONDSTooltip = Basissekunden Wartezeit zwischen Wiederholungen, multipliziert mit der Wiederholungsnummer (Wiederholung 1 = 1x, Wiederholung 2 = 2x...). Standard 300.
+WHATSAPP_QUEUE_MAX_PER_RUN = Nachrichten pro Lauf (N)
+WHATSAPP_QUEUE_MAX_PER_RUNTooltip = Maximale Anzahl der pro Cron-Lauf gesendeten Nachrichten. Wird durch den 1. Parameter der geplanten Aufgabe überschrieben, falls angegeben. Standard 1.
+WHATSAPP_QUEUE_WINDOW_SECONDS = Fenster zwischen Stapeln (Sekunden)
+WHATSAPP_QUEUE_WINDOW_SECONDSTooltip = Mindestsekunden zwischen Sendestapeln. Wird durch den 2. Parameter der geplanten Aufgabe überschrieben, falls angegeben. Standard 150.
+WHATSAPP_QUEUE_JITTER_SECONDS = Jitter (Sekunden)
+WHATSAPP_QUEUE_JITTER_SECONDSTooltip = Zufällige Sekunden, die dem Fenster für ein natürlicheres Sendemuster hinzugefügt werden. Wird durch den 3. Parameter der geplanten Aufgabe überschrieben, falls angegeben. Standard 30.
+WHATSAPP_FORCE_QUEUE = Erinnerungen einreihen
+WHATSAPP_FORCE_QUEUETooltip = Wenn aktiviert, werden WhatsApp-Erinnerungen eingereiht, anstatt sofort gesendet zu werden, und unterliegen der Warteschlangen-Kadenz.

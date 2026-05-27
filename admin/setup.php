@@ -115,9 +115,40 @@ if ($resql) {
 $item = $formSetup->newItem('WHATSAPP_WEBHOOK_USER_ID')->setAsSelect($users);
 $item = $formSetup->newItem('WHATSAPP_SHOW_ON_GETNOMURL')->setAsYesNo();
 $item = $formSetup->newItem('MAIN_WHATSAPP_PHONE_PREFIX');
+$item = $formSetup->newItem('WHATSAPP_DEFAULT_COUNTRY_CODE');
+$item->defaultFieldValue = '34';
+$item->cssClass = 'maxwidth100';
 $item = $formSetup->newItem('WHATSAPP_STATUS_CACHE_TTL');
 $item->defaultFieldValue = '300';
 $item->cssClass = 'maxwidth100';
+$item = $formSetup->newItem('WHATSAPP_REMINDER_MAX_RETRIES');
+$item->defaultFieldValue = '3';
+$item->cssClass = 'maxwidth100';
+// Send text + document in a single message (text as caption) - applies to direct send and queue
+$item = $formSetup->newItem('WHATSAPP_COMBINE_TEXT_WITH_DOC')->setAsYesNo();
+$item->defaultFieldValue = '1';
+
+// --- Message queue settings ---
+// All queue settings are configured here. The scheduled task processQueue() reads them from
+// these constants when its parameters are left empty. Cron parameters remain as an optional
+// per-job override (precedence: cron parameter > constant > default).
+$formSetup->newItem('WhatsappQueueSettings')->setAsTitle();
+$item = $formSetup->newItem('WHATSAPP_QUEUE_MAX_PER_RUN');
+$item->defaultFieldValue = '1';
+$item->cssClass = 'maxwidth100';
+$item = $formSetup->newItem('WHATSAPP_QUEUE_WINDOW_SECONDS');
+$item->defaultFieldValue = '150';
+$item->cssClass = 'maxwidth100';
+$item = $formSetup->newItem('WHATSAPP_QUEUE_JITTER_SECONDS');
+$item->defaultFieldValue = '30';
+$item->cssClass = 'maxwidth100';
+$item = $formSetup->newItem('WHATSAPP_QUEUE_MAX_RETRIES');
+$item->defaultFieldValue = '3';
+$item->cssClass = 'maxwidth100';
+$item = $formSetup->newItem('WHATSAPP_QUEUE_BACKOFF_SECONDS');
+$item->defaultFieldValue = '300';
+$item->cssClass = 'maxwidth100';
+$formSetup->newItem('WHATSAPP_FORCE_QUEUE')->setAsYesNo();
 // // Hôte
 // $item = $formSetup->newItem('NO_PARAM_JUST_TEXT');
 // $item->fieldOverride = (empty($_SERVER['HTTPS']) ? 'http://' : 'https://') . $_SERVER['HTTP_HOST'];
@@ -531,6 +562,84 @@ if (!$whatConf) {
 		print '<input type="submit" class="button" value="' . $langs->trans("SendTestMessage") . '">';
 		print '</div>';
 
+		print '</form>';
+		print '<br>';
+
+		// ============================================================
+		// Encolar mensajes de prueba (para probar la tarea programada)
+		// ============================================================
+
+		// Procesar encolado de texto de prueba
+		if ($action == 'enqueuetesttext' && !empty($_POST['test_phone'])) {
+			dol_include_once('/whatsapp/class/whatsappqueue.class.php');
+			$qphone = GETPOST('test_phone', 'alphanohtml');
+			$qmessage = GETPOST('test_message', 'restricthtml');
+			if (trim($qmessage) === '') {
+				$qmessage = $langs->transnoentities('WhatsappQueueTest') . ' - ' . dol_print_date(dol_now(), 'dayhour');
+			}
+			$qid = WhatsappQueue::enqueueText($qphone, $qmessage, array('source_module' => 'whatsapp:setuptest'));
+			if ($qid > 0) {
+				setEventMessages($langs->trans('WhatsappQueueEnqueuedOk', $qid), null, 'mesgs');
+			} else {
+				setEventMessages($langs->trans('WhatsappQueueEnqueuedKo'), null, 'errors');
+			}
+		}
+
+		// Procesar encolado de documento de prueba (subida de fichero a disco)
+		if ($action == 'enqueuetestdoc' && !empty($_POST['test_phone']) && !empty($_FILES['test_file']['name'])) {
+			dol_include_once('/whatsapp/class/whatsappqueue.class.php');
+			require_once DOL_DOCUMENT_ROOT . '/core/lib/files.lib.php';
+			$qphone = GETPOST('test_phone', 'alphanohtml');
+			$updir = $conf->whatsapp->dir_output . '/temp/queuetest';
+			dol_mkdir($updir);
+			$origname = dol_sanitizeFileName($_FILES['test_file']['name']);
+			$destfull = $updir . '/' . dol_now() . '_' . $origname;
+			$resupload = dol_move_uploaded_file($_FILES['test_file']['tmp_name'], $destfull, 1, 0, $_FILES['test_file']['error']);
+			if (is_numeric($resupload) && $resupload > 0) {
+				$ext = strtolower(pathinfo($origname, PATHINFO_EXTENSION));
+				if (in_array($ext, array('jpg', 'jpeg', 'png', 'gif', 'webp'))) {
+					$mediatype = 'image';
+				} elseif (in_array($ext, array('mp4', '3gp', 'mov'))) {
+					$mediatype = 'video';
+				} else {
+					$mediatype = 'document';
+				}
+				$qid = WhatsappQueue::enqueueDocument($qphone, $destfull, $origname, $mediatype, '', array('source_module' => 'whatsapp:setuptest'));
+				if ($qid > 0) {
+					setEventMessages($langs->trans('WhatsappQueueEnqueuedOk', $qid), null, 'mesgs');
+				} else {
+					setEventMessages($langs->trans('WhatsappQueueEnqueuedKo'), null, 'errors');
+				}
+			} else {
+				setEventMessages($langs->trans('WhatsappQueueUploadFailed'), null, 'errors');
+			}
+		}
+
+		$queuelistlink = '<a href="' . dol_buildpath('/whatsapp/messagequeue_list.php', 1) . '">' . $langs->trans('WhatsappQueueList') . '</a>';
+		print load_fiche_titre($langs->trans('WhatsappQueueTest'), $queuelistlink, '');
+		print '<span class="opacitymedium">' . $langs->trans('WhatsappQueueTestHelp') . '</span><br><br>';
+
+		// Formulario: encolar texto
+		print '<form method="POST" action="' . $_SERVER["PHP_SELF"] . '?action=enqueuetesttext">';
+		print '<input type="hidden" name="token" value="' . newToken() . '">';
+		print '<table class="noborder centpercent">';
+		print '<tr class="liste_titre"><td colspan="2">' . $langs->trans('WhatsappQueueTypeText') . '</td></tr>';
+		print '<tr class="oddeven"><td width="30%">' . $langs->trans('PhoneNumber') . '</td><td><input type="text" name="test_phone" class="flat minwidth200" required> ' . $langs->trans('PhoneNumberFormat') . '</td></tr>';
+		print '<tr class="oddeven"><td>' . $langs->trans('Message') . '</td><td><textarea name="test_message" class="flat" rows="3" cols="50"></textarea></td></tr>';
+		print '</table>';
+		print '<div class="center"><input type="submit" class="button" value="' . $langs->trans('WhatsappQueueEnqueue') . '"></div>';
+		print '</form>';
+		print '<br>';
+
+		// Formulario: encolar documento (subida de fichero)
+		print '<form method="POST" enctype="multipart/form-data" action="' . $_SERVER["PHP_SELF"] . '?action=enqueuetestdoc">';
+		print '<input type="hidden" name="token" value="' . newToken() . '">';
+		print '<table class="noborder centpercent">';
+		print '<tr class="liste_titre"><td colspan="2">' . $langs->trans('WhatsappQueueTypeDocument') . '</td></tr>';
+		print '<tr class="oddeven"><td width="30%">' . $langs->trans('PhoneNumber') . '</td><td><input type="text" name="test_phone" class="flat minwidth200" required> ' . $langs->trans('PhoneNumberFormat') . '</td></tr>';
+		print '<tr class="oddeven"><td>' . $langs->trans('File') . '</td><td><input type="file" name="test_file" required></td></tr>';
+		print '</table>';
+		print '<div class="center"><input type="submit" class="button" value="' . $langs->trans('WhatsappQueueEnqueue') . '"></div>';
 		print '</form>';
 		print '<br>';
 
