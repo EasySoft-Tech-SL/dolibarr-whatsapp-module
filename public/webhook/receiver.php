@@ -159,13 +159,18 @@ try {
 		// createAgendaEvent($eventData);
 
 		//Primero buscamos el sender usando 34$phone@s.whatsapp.net la parte del telefono 34 66143134
+		// Seguridad (CWE-89): remoteJid proviene del cuerpo del webhook (entrada externa no confiable).
+		// Reducimos el identificador a solo digitos ANTES de usarlo en la consulta, de modo que no pueda
+		// contener comillas ni palabras clave SQL, y ademas escapamos como defensa en profundidad.
 		$phoneext = explode('@', $phoneDestination)[0];
+		$phoneext = preg_replace('/[^0-9]/', '', $phoneext);
 		$phone = substr($phoneext, 2);
 		$prefix = substr($phoneext, 0, 2);
 		if (!empty($phone)) {
+			$phone = $db->escape($phone);
 			$sql = "SELECT s.rowid FROM " . MAIN_DB_PREFIX . "societe s ";
 			$sql .= " LEFT JOIN " . MAIN_DB_PREFIX . "societe_extrafields se ON s.rowid=se.fk_object ";
-			$sql .= " WHERE REGEXP_REPLACE(s.phone, '[^0-9]', '') = '$phone' OR REGEXP_REPLACE(se.whatsapp_phone_number, '[^0-9]', '') = '$phone'";
+			$sql .= " WHERE REGEXP_REPLACE(s.phone, '[^0-9]', '') = '" . $phone . "' OR REGEXP_REPLACE(se.whatsapp_phone_number, '[^0-9]', '') = '" . $phone . "'";
 			$sql .= " AND s.entity IN (" . getEntity('societe', 1) . ") LIMIT 1";
 			$result = $db->query($sql);
 

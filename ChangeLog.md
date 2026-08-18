@@ -1,5 +1,14 @@
 # CHANGELOG WHATSAPP FOR [DOLIBARR ERP CRM](https://www.dolibarr.org)
 
+## [1.10] - 2026-08-18
+
+### 🔐 Seguridad: corrección de inyección SQL en el webhook (CWE-89)
+
+- **Inyección SQL ciega en el receptor de webhooks (crítico).** El endpoint público `public/webhook/receiver.php` construía la consulta de búsqueda del tercero interpolando directamente el número derivado de `data.key.remoteJid` (entrada del cuerpo JSON, no autenticada). Un atacante remoto podía manipular ese valor para alterar la consulta (demostrable con *time-based blind* `OR SLEEP(n)`). Reportada mediante divulgación coordinada de **INCIBE** (CVSS v4.0 **8.8** — `AV:N/AC:L/AT:N/PR:N/UI:N/VC:H/VI:N/VA:L`).
+- **Corrección aplicada (doble barrera):** el identificador se reduce a solo dígitos (`preg_replace('/[^0-9]/','')`) **antes** de intervenir en la consulta, de modo que no puede contener comillas ni palabras clave SQL, y adicionalmente se escapa con `$db->escape()` como defensa en profundidad.
+- **Segunda instancia corregida:** el mismo patrón estaba duplicado en el endpoint REST autenticado `class/api_whatsapp.class.php` (`processWebhook`); se aplicó idéntica corrección.
+- **Mitigación temporal** para instalaciones que no puedan actualizar de inmediato: desactivar la constante `WHATSAPP_WEBHOOK_ALLOW`.
+
 ## [1.9] - 2026-05-27
 
 ### ✨ Nueva Funcionalidad: Cola de mensajería con envío escalonado (anti-SPAM)
