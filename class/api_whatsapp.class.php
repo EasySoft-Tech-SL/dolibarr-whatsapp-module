@@ -153,7 +153,7 @@ class WhatsappApi extends DolibarrApi
 			$webhookLog->data = json_encode($eventData['data'] ?? '', JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
 			$webhookLog->destination = $destination;
 			$webhookLog->date_time = $timestamp;
-			$webhookLog->sender = $sender;
+			$webhookLog->sender = isset($eventData['sender']) ? $eventData['sender'] : '';
 			$webhookLog->server_url = $serverUrl;
 			$webhookLog->apikey = $apikey;
 			$webhookLog->timestamp = $timestamp;
@@ -171,8 +171,9 @@ class WhatsappApi extends DolibarrApi
 				throw new RestException(500, 'Error al guardar el webhook en la base de datos');
 			}
 		} catch (Exception $e) {
-			// Manejar excepciones
-			throw new RestException(500, 'Error al procesar el webhook: ' . $e->getMessage());
+			// Seguridad (CWE-209): no filtrar el detalle interno al cliente; registrarlo en el log del servidor.
+			dol_syslog('WhatsApp API processWebhook error: ' . $e->getMessage(), LOG_ERR);
+			throw new RestException(500, 'Error interno al procesar el webhook');
 		}
 	}
 }

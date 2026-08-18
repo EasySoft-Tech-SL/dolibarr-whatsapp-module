@@ -62,6 +62,12 @@ require_once '../lib/whatsapp.lib.php';
 // Translations
 $langs->loadLangs(array("errors", "admin", "whatsapp@whatsapp"));
 
+// Seguridad: es una pagina de administracion que dispara una peticion saliente con el token
+// de la API. Debe restringirse a administradores (las paginas hermanas ya lo hacen).
+if (empty($user->admin)) {
+	accessforbidden();
+}
+
 
 
 // Parameters
@@ -124,7 +130,7 @@ if ($whatConf === false) {
 		'',
 		0,
 		array('User-Agent: Dolibarr-WhatsApp/1.0', 'Accept: text/html,application/json'),
-		array('http', 'https'),
+		array('https'),  // Solo HTTPS: el token viaja en la peticion; evitar texto claro / MITM
 		2  // Permite tanto URLs externas como locales
 	);
 

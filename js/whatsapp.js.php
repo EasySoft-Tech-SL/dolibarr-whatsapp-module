@@ -316,6 +316,9 @@ $(document).ready(function() {
 						dataType: "json",
 						success: function(data) {
 							var chatBody = $("#wa-chat-body");
+							// Seguridad (XSS): escapar todo texto no confiable antes de inyectarlo como HTML.
+							// El contenido del mensaje y el nombre de instancia provienen del webhook (entrada externa).
+							var waEsc = function (s) { return $('<div>').text(s == null ? '' : s).html(); };
 							chatBody.html(""); // Limpiar contenedor
 
 							if (data.success) {
@@ -328,7 +331,7 @@ $(document).ready(function() {
 										// Construir la etiqueta de instancia si existe
 										var instanceTag = "";
 										if (msg.array_options?.options_whatsapp_server_instance_name && msg.array_options?.options_whatsapp_server_instance_name?.trim() !== "") {
-											instanceTag = '<div class="wa-instance-container"><div class="wa-instance-tag">' + msg.array_options?.options_whatsapp_server_instance_name + '</div></div>';
+											instanceTag = '<div class="wa-instance-container"><div class="wa-instance-tag">' + waEsc(msg.array_options?.options_whatsapp_server_instance_name) + '</div></div>';
 										}
 
 										// Construir la información del objeto vinculado
@@ -347,7 +350,7 @@ $(document).ready(function() {
 											'<div class="wa-message-content ' + contentClass + '">' +
 											(instanceTag ? instanceTag : '') +
 											(linkedObjectHtml ? linkedObjectHtml : '') + // Objeto vinculado en la parte superior
-											'<p>' + msg.content + '</p>' +
+											'<p>' + waEsc(msg.content) + '</p>' +
 											'<div class="wa-message-info">' +
 											'<span class="wa-message-time">' + msg.date + '</span>' +
 											'</div>' +
@@ -366,7 +369,7 @@ $(document).ready(function() {
 								}
 							} else {
 								chatBody.html('<div class="wa-error">' +
-									'<p>' + data.error + '</p>' +
+									'<p>' + waEsc(data.error) + '</p>' +
 									'</div>');
 							}
 						},

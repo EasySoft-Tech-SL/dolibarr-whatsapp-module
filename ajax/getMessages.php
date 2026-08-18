@@ -283,9 +283,9 @@ if (!empty($whatsAppMessages)) {
 					$linkedObj = new Societe($db);
 					if ($linkedObj->fetch($message->fk_element) > 0) {
 						$objectLabel = $langs->trans("Company");
-						$linkedObjectInfo = $objectLabel . ": " . $linkedObj->name;
+						$linkedObjectInfo = $objectLabel . ": " . dol_escape_htmltag($linkedObj->name);
 						$url = DOL_URL_ROOT . '/societe/card.php?socid=' . $linkedObj->id;
-						$linkedObjectHtml = '<a href="' . $url . '" target="_blank"><i class="fas fa-building"></i> ' . $objectLabel . ': ' . $linkedObj->name . '</a>';
+						$linkedObjectHtml = '<a href="' . $url . '" target="_blank"><i class="fas fa-building"></i> ' . $objectLabel . ': ' . dol_escape_htmltag($linkedObj->name) . '</a>';
 					}
 					break;
 				case 'invoice':
@@ -293,9 +293,9 @@ if (!empty($whatsAppMessages)) {
 					$linkedObj = new Facture($db);
 					if ($linkedObj->fetch($message->fk_element) > 0) {
 						$objectLabel = $langs->trans("Invoice");
-						$linkedObjectInfo = $objectLabel . ": " . $linkedObj->ref;
+						$linkedObjectInfo = $objectLabel . ": " . dol_escape_htmltag($linkedObj->ref);
 						$url = DOL_URL_ROOT . '/compta/facture/card.php?facid=' . $linkedObj->id;
-						$linkedObjectHtml = '<a href="' . $url . '" target="_blank"><i class="fas fa-file-invoice-dollar"></i> ' . $objectLabel . ': ' . $linkedObj->ref . '</a>';
+						$linkedObjectHtml = '<a href="' . $url . '" target="_blank"><i class="fas fa-file-invoice-dollar"></i> ' . $objectLabel . ': ' . dol_escape_htmltag($linkedObj->ref) . '</a>';
 					}
 					break;
 				case 'order':
@@ -303,9 +303,9 @@ if (!empty($whatsAppMessages)) {
 					$linkedObj = new Commande($db);
 					if ($linkedObj->fetch($message->fk_element) > 0) {
 						$objectLabel = $langs->trans("Order");
-						$linkedObjectInfo = $objectLabel . ": " . $linkedObj->ref;
+						$linkedObjectInfo = $objectLabel . ": " . dol_escape_htmltag($linkedObj->ref);
 						$url = DOL_URL_ROOT . '/commande/card.php?id=' . $linkedObj->id;
-						$linkedObjectHtml = '<a href="' . $url . '" target="_blank"><i class="fas fa-shopping-cart"></i> ' . $objectLabel . ': ' . $linkedObj->ref . '</a>';
+						$linkedObjectHtml = '<a href="' . $url . '" target="_blank"><i class="fas fa-shopping-cart"></i> ' . $objectLabel . ': ' . dol_escape_htmltag($linkedObj->ref) . '</a>';
 					}
 					break;
 				case 'propal':
@@ -313,9 +313,9 @@ if (!empty($whatsAppMessages)) {
 					$linkedObj = new Propal($db);
 					if ($linkedObj->fetch($message->fk_element) > 0) {
 						$objectLabel = $langs->trans("Proposal");
-						$linkedObjectInfo = $objectLabel . ": " . $linkedObj->ref;
+						$linkedObjectInfo = $objectLabel . ": " . dol_escape_htmltag($linkedObj->ref);
 						$url = DOL_URL_ROOT . '/comm/propal/card.php?id=' . $linkedObj->id;
-						$linkedObjectHtml = '<a href="' . $url . '" target="_blank"><i class="fas fa-file-signature"></i> ' . $objectLabel . ': ' . $linkedObj->ref . '</a>';
+						$linkedObjectHtml = '<a href="' . $url . '" target="_blank"><i class="fas fa-file-signature"></i> ' . $objectLabel . ': ' . dol_escape_htmltag($linkedObj->ref) . '</a>';
 					}
 					break;
 				case 'project':
@@ -324,9 +324,9 @@ if (!empty($whatsAppMessages)) {
 					$linkedObj = new Project($db);
 					if ($linkedObj->fetch($message->fk_element) > 0) {
 						$objectLabel = $langs->trans("Project");
-						$linkedObjectInfo = $objectLabel . ": " . $linkedObj->ref;
+						$linkedObjectInfo = $objectLabel . ": " . dol_escape_htmltag($linkedObj->ref);
 						$url = DOL_URL_ROOT . '/projet/card.php?id=' . $linkedObj->id;
-						$linkedObjectHtml = '<a href="' . $url . '" target="_blank"><i class="fas fa-project-diagram"></i> ' . $objectLabel . ': ' . $linkedObj->ref . '</a>';
+						$linkedObjectHtml = '<a href="' . $url . '" target="_blank"><i class="fas fa-project-diagram"></i> ' . $objectLabel . ': ' . dol_escape_htmltag($linkedObj->ref) . '</a>';
 					}
 					break;
 				// NUEVOS CASOS AÑADIDOS
@@ -336,9 +336,9 @@ if (!empty($whatsAppMessages)) {
 					$linkedObj = new Expedition($db);
 					if ($linkedObj->fetch($message->fk_element) > 0) {
 						$objectLabel = $langs->trans("Shipment");
-						$linkedObjectInfo = $objectLabel . ": " . $linkedObj->ref;
+						$linkedObjectInfo = $objectLabel . ": " . dol_escape_htmltag($linkedObj->ref);
 						$url = DOL_URL_ROOT . '/expedition/card.php?id=' . $linkedObj->id;
-						$linkedObjectHtml = '<a href="' . $url . '" target="_blank"><i class="fas fa-truck"></i> ' . $objectLabel . ': ' . $linkedObj->ref . '</a>';
+						$linkedObjectHtml = '<a href="' . $url . '" target="_blank"><i class="fas fa-truck"></i> ' . $objectLabel . ': ' . dol_escape_htmltag($linkedObj->ref) . '</a>';
 					}
 					break;
 				case 'delivery':
@@ -347,9 +347,9 @@ if (!empty($whatsAppMessages)) {
 					$linkedObj = new Reception($db);
 					if ($linkedObj->fetch($message->fk_element) > 0) {
 						$objectLabel = $langs->trans("Reception");
-						$linkedObjectInfo = $objectLabel . ": " . $linkedObj->ref;
+						$linkedObjectInfo = $objectLabel . ": " . dol_escape_htmltag($linkedObj->ref);
 						$url = DOL_URL_ROOT . '/reception/card.php?id=' . $linkedObj->id;
-						$linkedObjectHtml = '<a href="' . $url . '" target="_blank"><i class="fas fa-dolly"></i> ' . $objectLabel . ': ' . $linkedObj->ref . '</a>';
+						$linkedObjectHtml = '<a href="' . $url . '" target="_blank"><i class="fas fa-dolly"></i> ' . $objectLabel . ': ' . dol_escape_htmltag($linkedObj->ref) . '</a>';
 					}
 					break;
 				case 'invoice_supplier':
@@ -357,9 +357,9 @@ if (!empty($whatsAppMessages)) {
 					$linkedObj = new FactureFournisseur($db);
 					if ($linkedObj->fetch($message->fk_element) > 0) {
 						$objectLabel = $langs->trans("SupplierInvoice");
-						$linkedObjectInfo = $objectLabel . ": " . $linkedObj->ref;
+						$linkedObjectInfo = $objectLabel . ": " . dol_escape_htmltag($linkedObj->ref);
 						$url = DOL_URL_ROOT . '/fourn/facture/card.php?facid=' . $linkedObj->id;
-						$linkedObjectHtml = '<a href="' . $url . '" target="_blank"><i class="fas fa-file-invoice"></i> ' . $objectLabel . ': ' . $linkedObj->ref . '</a>';
+						$linkedObjectHtml = '<a href="' . $url . '" target="_blank"><i class="fas fa-file-invoice"></i> ' . $objectLabel . ': ' . dol_escape_htmltag($linkedObj->ref) . '</a>';
 					}
 					break;
 				case 'order_supplier':
@@ -367,9 +367,9 @@ if (!empty($whatsAppMessages)) {
 					$linkedObj = new CommandeFournisseur($db);
 					if ($linkedObj->fetch($message->fk_element) > 0) {
 						$objectLabel = $langs->trans("SupplierOrder");
-						$linkedObjectInfo = $objectLabel . ": " . $linkedObj->ref;
+						$linkedObjectInfo = $objectLabel . ": " . dol_escape_htmltag($linkedObj->ref);
 						$url = DOL_URL_ROOT . '/fourn/commande/card.php?id=' . $linkedObj->id;
-						$linkedObjectHtml = '<a href="' . $url . '" target="_blank"><i class="fas fa-shopping-basket"></i> ' . $objectLabel . ': ' . $linkedObj->ref . '</a>';
+						$linkedObjectHtml = '<a href="' . $url . '" target="_blank"><i class="fas fa-shopping-basket"></i> ' . $objectLabel . ': ' . dol_escape_htmltag($linkedObj->ref) . '</a>';
 					}
 					break;
 				case 'supplier_proposal':
@@ -377,9 +377,9 @@ if (!empty($whatsAppMessages)) {
 					$linkedObj = new SupplierProposal($db);
 					if ($linkedObj->fetch($message->fk_element) > 0) {
 						$objectLabel = $langs->trans("SupplierProposal");
-						$linkedObjectInfo = $objectLabel . ": " . $linkedObj->ref;
+						$linkedObjectInfo = $objectLabel . ": " . dol_escape_htmltag($linkedObj->ref);
 						$url = DOL_URL_ROOT . '/supplier_proposal/card.php?id=' . $linkedObj->id;
-						$linkedObjectHtml = '<a href="' . $url . '" target="_blank"><i class="fas fa-file-signature"></i> ' . $objectLabel . ': ' . $linkedObj->ref . '</a>';
+						$linkedObjectHtml = '<a href="' . $url . '" target="_blank"><i class="fas fa-file-signature"></i> ' . $objectLabel . ': ' . dol_escape_htmltag($linkedObj->ref) . '</a>';
 					}
 					break;
 				case 'contract':
@@ -387,9 +387,9 @@ if (!empty($whatsAppMessages)) {
 					$linkedObj = new Contrat($db);
 					if ($linkedObj->fetch($message->fk_element) > 0) {
 						$objectLabel = $langs->trans("Contract");
-						$linkedObjectInfo = $objectLabel . ": " . $linkedObj->ref;
+						$linkedObjectInfo = $objectLabel . ": " . dol_escape_htmltag($linkedObj->ref);
 						$url = DOL_URL_ROOT . '/contrat/card.php?id=' . $linkedObj->id;
-						$linkedObjectHtml = '<a href="' . $url . '" target="_blank"><i class="fas fa-handshake"></i> ' . $objectLabel . ': ' . $linkedObj->ref . '</a>';
+						$linkedObjectHtml = '<a href="' . $url . '" target="_blank"><i class="fas fa-handshake"></i> ' . $objectLabel . ': ' . dol_escape_htmltag($linkedObj->ref) . '</a>';
 					}
 					break;
 				case 'ticket':
@@ -397,9 +397,9 @@ if (!empty($whatsAppMessages)) {
 					$linkedObj = new Ticket($db);
 					if ($linkedObj->fetch($message->fk_element) > 0) {
 						$objectLabel = $langs->trans("Ticket");
-						$linkedObjectInfo = $objectLabel . ": " . $linkedObj->ref;
+						$linkedObjectInfo = $objectLabel . ": " . dol_escape_htmltag($linkedObj->ref);
 						$url = DOL_URL_ROOT . '/ticket/card.php?id=' . $linkedObj->id;
-						$linkedObjectHtml = '<a href="' . $url . '" target="_blank"><i class="fas fa-ticket-alt"></i> ' . $objectLabel . ': ' . $linkedObj->ref . '</a>';
+						$linkedObjectHtml = '<a href="' . $url . '" target="_blank"><i class="fas fa-ticket-alt"></i> ' . $objectLabel . ': ' . dol_escape_htmltag($linkedObj->ref) . '</a>';
 					}
 					break;
 				case 'expensereport':
@@ -407,9 +407,9 @@ if (!empty($whatsAppMessages)) {
 					$linkedObj = new ExpenseReport($db);
 					if ($linkedObj->fetch($message->fk_element) > 0) {
 						$objectLabel = $langs->trans("ExpenseReport");
-						$linkedObjectInfo = $objectLabel . ": " . $linkedObj->ref;
+						$linkedObjectInfo = $objectLabel . ": " . dol_escape_htmltag($linkedObj->ref);
 						$url = DOL_URL_ROOT . '/expensereport/card.php?id=' . $linkedObj->id;
-						$linkedObjectHtml = '<a href="' . $url . '" target="_blank"><i class="fas fa-receipt"></i> ' . $objectLabel . ': ' . $linkedObj->ref . '</a>';
+						$linkedObjectHtml = '<a href="' . $url . '" target="_blank"><i class="fas fa-receipt"></i> ' . $objectLabel . ': ' . dol_escape_htmltag($linkedObj->ref) . '</a>';
 					}
 					break;
 				case 'intervention':
@@ -417,9 +417,9 @@ if (!empty($whatsAppMessages)) {
 					$linkedObj = new Fichinter($db);
 					if ($linkedObj->fetch($message->fk_element) > 0) {
 						$objectLabel = $langs->trans("Intervention");
-						$linkedObjectInfo = $objectLabel . ": " . $linkedObj->ref;
+						$linkedObjectInfo = $objectLabel . ": " . dol_escape_htmltag($linkedObj->ref);
 						$url = DOL_URL_ROOT . '/fichinter/card.php?id=' . $linkedObj->id;
-						$linkedObjectHtml = '<a href="' . $url . '" target="_blank"><i class="fas fa-tools"></i> ' . $objectLabel . ': ' . $linkedObj->ref . '</a>';
+						$linkedObjectHtml = '<a href="' . $url . '" target="_blank"><i class="fas fa-tools"></i> ' . $objectLabel . ': ' . dol_escape_htmltag($linkedObj->ref) . '</a>';
 					}
 					break;
 				// CASO PARA PRODUCTOS Y SERVICIOS
@@ -435,9 +435,9 @@ if (!empty($whatsAppMessages)) {
 							$objectLabel = $langs->trans("Product");
 							$icon = 'fas fa-cube';
 						}
-						$linkedObjectInfo = $objectLabel . ": " . $linkedObj->ref . ' - ' . $linkedObj->label;
+						$linkedObjectInfo = $objectLabel . ": " . dol_escape_htmltag($linkedObj->ref) . ' - ' . dol_escape_htmltag($linkedObj->label);
 						$url = DOL_URL_ROOT . '/product/card.php?id=' . $linkedObj->id;
-						$linkedObjectHtml = '<a href="' . $url . '" target="_blank"><i class="' . $icon . '"></i> ' . $objectLabel . ': ' . $linkedObj->ref . ' - ' . $linkedObj->label . '</a>';
+						$linkedObjectHtml = '<a href="' . $url . '" target="_blank"><i class="' . $icon . '"></i> ' . $objectLabel . ': ' . dol_escape_htmltag($linkedObj->ref) . ' - ' . dol_escape_htmltag($linkedObj->label) . '</a>';
 					}
 					break;
 				// Añadir soporte para contactos
@@ -447,9 +447,9 @@ if (!empty($whatsAppMessages)) {
 					$linkedObj = new Contact($db);
 					if ($linkedObj->fetch($message->fk_element) > 0) {
 						$objectLabel = $langs->trans("Contact");
-						$linkedObjectInfo = $objectLabel . ": " . $linkedObj->getFullName($langs);
+						$linkedObjectInfo = $objectLabel . ": " . dol_escape_htmltag($linkedObj->getFullName($langs));
 						$url = DOL_URL_ROOT . '/contact/card.php?id=' . $linkedObj->id;
-						$linkedObjectHtml = '<a href="' . $url . '" target="_blank"><i class="fas fa-user"></i> ' . $objectLabel . ': ' . $linkedObj->getFullName($langs) . '</a>';
+						$linkedObjectHtml = '<a href="' . $url . '" target="_blank"><i class="fas fa-user"></i> ' . $objectLabel . ': ' . dol_escape_htmltag($linkedObj->getFullName($langs)) . '</a>';
 					}
 					break;
 				default:
@@ -475,7 +475,7 @@ if (!empty($whatsAppMessages)) {
 			'direction' => $direction,
 			'type' => $message->code, // Tipo de mensaje (texto, audio, PDF...)
 			'array_options' => $message->array_options,
-			'linkedobject' => $linkedObjectInfo, // Texto plano (para compatibilidad)
+			'linkedobject' => dol_escape_htmltag($linkedObjectInfo), // Texto plano (para compatibilidad)
 			'linkedobject_html' => $linkedObjectHtml, // HTML con getNomUrl si está disponible
 		);
 	}

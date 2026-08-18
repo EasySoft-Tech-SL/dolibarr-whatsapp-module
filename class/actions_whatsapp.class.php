@@ -152,6 +152,11 @@ class ActionsWhatsapp
 
 		/* print_r($parameters); print_r($object); echo "action: " . $action; */
 		if (in_array('globalcard', $contexts) && $action == 'confirm_send_whatsapp_form') {
+			// Seguridad: re-verificar el permiso tambien en el handler de ejecucion,
+			// no solo al pintar el formulario de envio.
+			if (empty($user->rights->whatsapp->read)) {
+				accessforbidden();
+			}
 			dol_include_once('/core/class/html.form.class.php');
 			dol_include_once('/whatsapp/lib/whatsapp_templates.lib.php');
 			dol_include_once('/whatsapp/lib/whatsapp.lib.php');
@@ -220,15 +225,28 @@ class ActionsWhatsapp
 			$contenttosend = HtmlToWhatsApp::convert($contenttosend);
 
 			//Array de de ficheros
+			// Seguridad (path traversal / LFI): whatsapp_pdf_files llega del cliente y 'alphanohtml'
+			// NO filtra rutas absolutas. Solo se aceptan ficheros PDF ubicados dentro del arbol de
+			// documentos de Dolibarr (DOL_DATA_ROOT); asi se impide exfiltrar conf.php u otros
+			// ficheros del sistema/codigo enviando una ruta absoluta.
 			$pdfOK = array();
-			if (is_array($whatsappPdfFiles) && count($whatsappPdfFiles) > 0) {
+			$basedirReal = realpath(DOL_DATA_ROOT);
+			if (is_array($whatsappPdfFiles) && count($whatsappPdfFiles) > 0 && $basedirReal !== false) {
 				foreach ($whatsappPdfFiles as $file) {
-					//comprueba si el fichero existe sino continue
-					if (!file_exists($file)) {
+					$realFile = realpath($file);
+					// Fichero inexistente o irresoluble -> descartar
+					if ($realFile === false) {
 						continue;
 					}
-
-					$pdfOK[] = $file;
+					// Fuera del arbol de documentos -> descartar
+					if (strpos($realFile, $basedirReal . DIRECTORY_SEPARATOR) !== 0) {
+						continue;
+					}
+					// Solo se permiten PDF
+					if (!preg_match('/\.pdf$/i', $realFile)) {
+						continue;
+					}
+					$pdfOK[] = $realFile;
 				}
 			}
 

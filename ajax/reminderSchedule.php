@@ -12,7 +12,8 @@ if (!defined('NOREQUIREMENU'))  define('NOREQUIREMENU', '1');
 if (!defined('NOREQUIREHTML'))  define('NOREQUIREHTML', '1');
 if (!defined('NOREQUIREAJAX'))  define('NOREQUIREAJAX', '1');
 if (!defined('NOREQUIRESOC'))   define('NOREQUIRESOC', '1');
-if (!defined('NOCSRFCHECK'))    define('NOCSRFCHECK', '1');
+// Seguridad (CSRF): NO se define NOCSRFCHECK. main.inc.php valida el token en las peticiones POST;
+// el template recurrence_view.tpl.php ya envia 'token' (newToken()) en cada $.post.
 
 // Load Dolibarr environment
 $res = 0;
@@ -46,6 +47,13 @@ $langs->load("whatsapp@whatsapp");
 if (!$user->rights->whatsapp->read) {
 	http_response_code(403);
 	echo json_encode(array('status' => 'error', 'message' => $langs->trans('AccessDenied')));
+	exit;
+}
+
+// Seguridad (CSRF): todas las acciones de este endpoint mutan datos; exigir POST.
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+	http_response_code(405);
+	echo json_encode(array('status' => 'error', 'message' => 'Method not allowed'));
 	exit;
 }
 

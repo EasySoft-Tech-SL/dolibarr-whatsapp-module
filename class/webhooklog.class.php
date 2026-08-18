@@ -114,7 +114,8 @@ class WebhookLog extends CommonObject
 		'date_time' => array('type' => 'datetime', 'label' => 'Date', 'enabled' => '1', 'position' => 50, 'notnull' => 0, 'visible' => 1, 'index' => 0, 'validate' => '1', 'comment' => "Date and time of event"),
 		'sender' => array('type' => 'varchar(255)', 'label' => 'CheckTransmitter', 'enabled' => '1', 'position' => 60, 'notnull' => 0, 'visible' => 1, 'index' => 1, 'searchall' => 1, 'css' => 'minwidth300', 'validate' => '1', 'comment' => "Sender identifier"),
 		'server_url' => array('type' => 'varchar(255)', 'label' => 'ServerURL', 'enabled' => '1', 'position' => 70, 'notnull' => 0, 'visible' => 1, 'searchall' => 1, 'css' => 'minwidth300', 'validate' => '1', 'comment' => "Server URL"),
-		'apikey' => array('type' => 'varchar(255)', 'label' => 'APIKey', 'enabled' => '1', 'position' => 80, 'notnull' => 0, 'visible' => 1, 'searchall' => 1, 'css' => 'minwidth300', 'validate' => '1', 'comment' => "API Key"),
+		// Seguridad: la apikey es un secreto de la instancia; no debe mostrarse ni ser buscable en la UI (visible=0, sin searchall).
+		'apikey' => array('type' => 'varchar(255)', 'label' => 'APIKey', 'enabled' => '1', 'position' => 80, 'notnull' => 0, 'visible' => 0, 'css' => 'minwidth300', 'validate' => '1', 'comment' => "API Key"),
 		'timestamp' => array('type' => 'datetime', 'label' => 'Timestamp', 'enabled' => '1', 'position' => 90, 'notnull' => 0, 'visible' => 1, 'index' => 1, 'validate' => '1', 'comment' => "Timestamp of event"),
 	);
 

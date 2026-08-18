@@ -9,6 +9,20 @@
 - **Segunda instancia corregida:** el mismo patrón estaba duplicado en el endpoint REST autenticado `class/api_whatsapp.class.php` (`processWebhook`); se aplicó idéntica corrección.
 - **Mitigación temporal** para instalaciones que no puedan actualizar de inmediato: desactivar la constante `WHATSAPP_WEBHOOK_ALLOW`.
 
+### 🛡️ Endurecimiento de seguridad adicional (auditoría interna)
+
+Auditoría de seguridad del módulo completo tras la corrección del SQLi. Hallazgos corregidos:
+
+- **XSS almacenado/DOM en el chat (alto):** el texto de mensajes entrantes (`data.message.conversation`) y el nombre de instancia del webhook se insertaban como HTML en el historial (`js/whatsapp.js.php` con `.append()`), permitiendo ejecutar script en la sesión del agente. Ahora se escapan en el sink y, como defensa en profundidad, se escapan en servidor los nombres/refs de los objetos vinculados en `ajax/getMessages.php` (cubre también un XSS de 2º orden vía API REST).
+- **Lectura arbitraria de ficheros / exfiltración (alto):** `whatsapp_pdf_files[]` aceptaba rutas absolutas (p. ej. `conf.php`) que se enviaban por WhatsApp. Ahora solo se admiten ficheros **PDF dentro de `DOL_DATA_ROOT`** (`realpath` + comprobación de prefijo).
+- **CSRF/IDOR en recordatorios:** `ajax/reminderSchedule.php` deja de desactivar la comprobación CSRF (valida el token que ya envía el cliente) y exige método POST.
+- **Exposición de la `apikey`:** el campo deja de ser visible y buscable en la UI (`visible=0`, sin `searchall`); se activa el control de permisos en el listado y la ficha de webhooklogs.
+- **`admin/plan_usage.php`:** restringida a administradores (`accessforbidden`) y forzado HTTPS en la petición saliente que transporta el token.
+- **API REST:** los mensajes de excepción dejan de exponer detalle interno al cliente (CWE-209) y se inicializa correctamente el remitente.
+- **Eliminado `public/webhook/viewer.php`:** endpoint obsoleto sin autenticación ni CSRF (los eventos se persisten en base de datos).
+
+> Nota: por decisión de compatibilidad, la autenticación de origen del webhook (firma/HMAC) no se modifica en esta versión; el endurecimiento del XSS neutraliza la ejecución de script derivada de webhooks no autenticados.
+
 ## [1.9] - 2026-05-27
 
 ### ✨ Nueva Funcionalidad: Cola de mensajería con envío escalonado (anti-SPAM)
