@@ -46,3 +46,6 @@ test_local/
 
 # Mantener el archivo de ejemplo de configuración pero ignorar copias locales
 *_new.lang
+
+# Historial de sesiones de SpecStory / Claude Code (no versionar)
+.specstory/
