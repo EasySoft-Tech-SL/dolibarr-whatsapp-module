@@ -85,6 +85,9 @@ La corrección está publicada en el repositorio oficial:
 - Repositorio: `https://github.com/EasySoft-Tech-SL/dolibarr-whatsapp-module`
 - Commit de la corrección: `8108537` (fix SQLi webhook, CWE-89)
 - Tag: **`v1.10`** (publicado el 2026-08-19)
+- GitHub Security Advisory **GHSA-53wq-3hgf-rg4j** (estado draft/embargo, con el detalle
+  técnico completo y el PoC, a disposición de INCIBE para validación):
+  `https://github.com/EasySoft-Tech-SL/dolibarr-whatsapp-module/security/advisories/GHSA-53wq-3hgf-rg4j`
 - Ficheros modificados: `public/webhook/receiver.php`, `class/api_whatsapp.class.php`,
   `core/modules/modWhatsapp.class.php` (versión → 1.10), `ChangeLog.md`
 
