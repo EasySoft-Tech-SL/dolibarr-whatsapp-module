@@ -1,5 +1,16 @@
 # CHANGELOG WHATSAPP FOR [DOLIBARR ERP CRM](https://www.dolibarr.org)
 
+## [1.11] - 2026-10-22
+
+### 🔐 Seguridad: autenticación de origen del webhook (CWE-306 / CWE-345)
+
+- **Webhook sin autenticación (Alto).** `public/webhook/receiver.php` corría con `NOLOGIN`/`NOCSRFCHECK` y su única puerta era `WHATSAPP_WEBHOOK_ALLOW`, que indica si el webhook está activo pero no quién llama. El campo `apikey` del cuerpo se guardaba en el log y no se comparaba con nada. Un cliente anónimo que conociera la URL podía inyectar eventos `messages.upsert` y crear entradas falsas en la agenda de un tercero, además de llenar la tabla de logs. Reportado por un investigador externo el 2026-10-21; ya figuraba como hallazgo #2 (Alto) de la auditoría interna del 2026-08-18.
+- **Corrección:** el receptor exige un secreto compartido y lo compara en tiempo constante con `hash_equals()`. Se acepta en la cabecera `X-Webhook-Secret`, en `Authorization: Bearer`, en el campo `apikey` del cuerpo (lo que envía Evolution API) o en el parámetro `secret` de la URL. Sin secreto configurado responde 503; con un secreto que no coincide, 401. `WHATSAPP_WEBHOOK_SECRET` se genera al activar el webhook o desde el botón de la pantalla de configuración.
+- **Compatibilidad:** si no hay `WHATSAPP_WEBHOOK_SECRET`, se acepta `WHATSAPP_SERVER_TOKEN` como secreto, de modo que las instalaciones que ya comparten ese token con la pasarela siguen recibiendo sin cambios. El secreto no se guarda en el log.
+- **Endurecimiento adicional:** se elimina `Access-Control-Allow-Origin: *` (endpoint servidor a servidor), se rechazan cuerpos de más de 1 MiB (413) antes de decodificarlos y se valida que el JSON sea un objeto. Se corrige además la precedencia del `WHERE` (`A OR B AND entity`) que dejaba la restricción de entidad solo en la segunda rama, en el receptor y en la API REST.
+- **Configuración:** la pantalla del módulo muestra la URL del webhook y el secreto, con botones para copiarlos, el estado de protección y las instrucciones para pegarlos en Mensaru o Evolution API.
+- **Mitigación temporal** para instalaciones que no puedan actualizar: desactivar `WHATSAPP_WEBHOOK_ALLOW`.
+
 ## [1.10] - 2026-08-18
 
 ### 🔐 Seguridad: corrección de inyección SQL en el webhook (CWE-89)

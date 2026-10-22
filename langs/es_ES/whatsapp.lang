@@ -290,6 +290,23 @@ WHATSAPP_WEBHOOK_ALLOW = Permitir Webhook
 WHATSAPP_WEBHOOK_ALLOWTooltip = Permitir Webhook (Activar o desactivar el webhook para recibir notificaciones), webbhok debe de ser confíurado en el servidor por el administrador.
 WHATSAPP_WEBHOOK_USER_ID =Usuario del Webhook
 WHATSAPP_WEBHOOK_USER_IDTooltip =Usuario del Webhook (Ponte en contacto con el administrador de tu servidor para obtener esta información)
+WhatsappWebhookSettings = Webhook de entrada
+WhatsappWebhookIntro = URL y secreto que debe usar la pasarela de WhatsApp para entregar los mensajes entrantes en este Dolibarr.
+WhatsappWebhookUrl = URL del webhook
+WhatsappWebhookUrlHelp = Pégala en la pasarela como webhook del evento MESSAGES_UPSERT. No cambia al actualizar el módulo.
+WhatsappWebhookSecret = Secreto compartido
+WhatsappWebhookSecretHelp = La pasarela debe enviarlo en la cabecera X-Webhook-Secret. También se aceptan Authorization: Bearer, el campo apikey del cuerpo y el parámetro secret de la URL.
+WhatsappWebhookSecretMissing = Sin secreto: el webhook rechaza las peticiones
+WhatsappWebhookSecretGenerated = Secreto del webhook generado. Cópialo a la pasarela antes de volver a recibir mensajes.
+WhatsappWebhookStatusProtected = Protegido
+WhatsappWebhookStatusTokenFallback = Compatible: se acepta el token de la API
+WhatsappWebhookStatusBlocked = Bloqueado: configura un secreto
+WhatsappWebhookHowTo = En Mensaru, pega esta URL en la configuración del webhook de la instancia y añade la cabecera X-Webhook-Secret con el secreto. Si esa pantalla no permite cabeceras, añade al final de la URL ?secret=TU_SECRETO. En Evolution API puedes usar el bloque de cabeceras personalizadas del webhook.
+WhatsappWebhookGenerateSecret = Generar secreto nuevo
+WhatsappWebhookCopy = Copiar
+WhatsappWebhookRegenerateWarning = Al generarlo, el webhook deja de recibir hasta que copies el nuevo secreto en la pasarela.
+WHATSAPP_WEBHOOK_SECRET = Secreto del webhook
+WHATSAPP_WEBHOOK_SECRETTooltip = Secreto compartido con la pasarela. El receptor rechaza cualquier petición que no lo traiga. Si se deja vacío y el webhook está activo, se genera uno nuevo.
 MissingParameters = Parámetros no encontrados
 WhatsappMessageNotSend = No enviado
 #

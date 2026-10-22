@@ -74,6 +74,7 @@ if (!$res) {
 	die("Include of main fails");
 }
 dol_include_once('/whatsapp/class/webhooklog.class.php');
+dol_include_once('/whatsapp/class/whatsappwebhookauth.class.php');
 dol_include_once('/whatsapp/lib/whatsapp.lib.php');
 // Configuración básica
 if (!empty($conf->global->WHATSAPP_WEBHOOK_USER_ID)) {
@@ -97,11 +98,9 @@ if ($debugMode) {
 
 // Verificar si es una solicitud OPTIONS (CORS preflight)
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
-	// Encabezados para CORS
-	header('Access-Control-Allow-Origin: *');
-	header('Access-Control-Allow-Methods: POST, OPTIONS');
-	header('Access-Control-Allow-Headers: Content-Type, Authorization');
-	header('Access-Control-Max-Age: 86400'); // 24 horas de caché
+	// No CORS headers: this endpoint is server-to-server, a browser origin is
+	// never expected and a wildcard would only widen the surface.
+	header('Allow: POST, OPTIONS');
 	exit(0);
 }
 
@@ -115,6 +114,14 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 // Obtener el cuerpo de la solicitud
 $webhookContent = file_get_contents('php://input');
 
+// Rechazar cuerpos desmesurados antes de decodificarlos (evita agotar memoria)
+if (WhatsappWebhookAuth::isBodyTooLarge(strlen((string) $webhookContent))) {
+	dol_syslog('WhatsApp webhook: body too large from ' . (isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : '?'), LOG_WARNING);
+	http_response_code(413);
+	header('Content-Type: application/json');
+	die(json_encode(['error' => 'Contenido demasiado grande']));
+}
+
 // Verificar que se recibió contenido
 if (empty($webhookContent)) {
 	log_error('No se recibió contenido');
@@ -126,10 +133,42 @@ if (empty($webhookContent)) {
 $eventData = json_decode($webhookContent, true);
 
 // Verificar que el JSON sea válido
-if (json_last_error() !== JSON_ERROR_NONE) {
+if (json_last_error() !== JSON_ERROR_NONE || !is_array($eventData)) {
 	log_error('JSON inválido: ' . json_last_error_msg());
 	http_response_code(400);
 	die(json_encode(['error' => 'JSON inválido: ' . json_last_error_msg()]));
+}
+
+// ---------------------------------------------------------------------------
+// Autenticación del origen (CWE-306 / CWE-345).
+// El cuerpo lo construye la pasarela de WhatsApp, no el emisor, así que se
+// aceptan las vías que la pasarela puede enviar: cabecera, Bearer, el campo
+// "apikey" del cuerpo o el parámetro "secret" de la URL. La comparación es en
+// tiempo constante con hash_equals().
+// ---------------------------------------------------------------------------
+$allowedSecrets = array();
+if (!empty($conf->global->WHATSAPP_WEBHOOK_SECRET)) {
+	$allowedSecrets[] = $conf->global->WHATSAPP_WEBHOOK_SECRET;
+} elseif (!empty($conf->global->WHATSAPP_SERVER_TOKEN)) {
+	// Compatibilidad: solo mientras no haya un secreto dedicado. El token de la
+	// API es una credencial más expuesta y no debe seguir valiendo cuando ya
+	// hay un secreto propio.
+	$allowedSecrets[] = $conf->global->WHATSAPP_SERVER_TOKEN;
+}
+
+if (empty($allowedSecrets)) {
+	dol_syslog('WhatsApp webhook: rejected, no secret configured', LOG_WARNING);
+	http_response_code(503);
+	header('Content-Type: application/json');
+	die(json_encode(['error' => 'Webhook sin secreto configurado']));
+}
+
+$providedSecret = WhatsappWebhookAuth::getProvidedSecret($eventData, $_SERVER, $_GET);
+if (!WhatsappWebhookAuth::matches($providedSecret, $allowedSecrets)) {
+	dol_syslog('WhatsApp webhook: rejected, invalid secret from ' . (isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : '?'), LOG_WARNING);
+	http_response_code(401);
+	header('Content-Type: application/json');
+	die(json_encode(['error' => 'No autorizado']));
 }
 
 // Añadir timestamp al evento
@@ -170,7 +209,7 @@ try {
 			$phone = $db->escape($phone);
 			$sql = "SELECT s.rowid FROM " . MAIN_DB_PREFIX . "societe s ";
 			$sql .= " LEFT JOIN " . MAIN_DB_PREFIX . "societe_extrafields se ON s.rowid=se.fk_object ";
-			$sql .= " WHERE REGEXP_REPLACE(s.phone, '[^0-9]', '') = '" . $phone . "' OR REGEXP_REPLACE(se.whatsapp_phone_number, '[^0-9]', '') = '" . $phone . "'";
+			$sql .= " WHERE (REGEXP_REPLACE(s.phone, '[^0-9]', '') = '" . $phone . "' OR REGEXP_REPLACE(se.whatsapp_phone_number, '[^0-9]', '') = '" . $phone . "')";
 			$sql .= " AND s.entity IN (" . getEntity('societe', 1) . ") LIMIT 1";
 			$result = $db->query($sql);
 
@@ -216,7 +255,7 @@ try {
 	$webhookLog->date_time = $timestamp;
 	$webhookLog->sender = $sender;
 	$webhookLog->server_url = $serverUrl;
-	$webhookLog->apikey = $apikey;
+	$webhookLog->apikey = WhatsappWebhookAuth::maskIfSecret($apikey, $allowedSecrets);
 	$webhookLog->timestamp = $timestamp;
 	// Crear objeto WebhookLog en la base de datos (primer parámetro es usuario, segundo es notrigger)
 	$result = $webhookLog->create($user);
@@ -225,7 +264,6 @@ try {
 		// Si se guardó correctamente, devolver éxito
 		http_response_code(200);
 		header('Content-Type: application/json');
-		header('Access-Control-Allow-Origin: *');
 		echo json_encode([
 			'success' => true,
 			'message' => "Evento '$eventType' de instancia '$instanceName' recibido y guardado correctamente",

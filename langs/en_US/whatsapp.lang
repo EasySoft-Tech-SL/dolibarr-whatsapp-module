@@ -290,6 +290,23 @@ WHATSAPP_WEBHOOK_ALLOW = Allow Webhook
 WHATSAPP_WEBHOOK_ALLOWTooltip = Allow Webhook (Enable or disable webhook to receive notifications), webhook must be configured on the server by the administrator.
 WHATSAPP_WEBHOOK_USER_ID =Webhook User
 WHATSAPP_WEBHOOK_USER_IDTooltip =Webhook User (Contact your server administrator to get this information)
+WhatsappWebhookSettings = Incoming webhook
+WhatsappWebhookIntro = URL and secret the WhatsApp gateway must use to deliver incoming messages to this Dolibarr.
+WhatsappWebhookUrl = Webhook URL
+WhatsappWebhookUrlHelp = Paste it in the gateway as the MESSAGES_UPSERT webhook. It does not change when the module is updated.
+WhatsappWebhookSecret = Shared secret
+WhatsappWebhookSecretHelp = The gateway must send it in the X-Webhook-Secret header. Authorization: Bearer, the apikey body field and the secret URL parameter are also accepted.
+WhatsappWebhookSecretMissing = No secret: the webhook rejects requests
+WhatsappWebhookSecretGenerated = Webhook secret generated. Copy it to the gateway before receiving messages again.
+WhatsappWebhookStatusProtected = Protected
+WhatsappWebhookStatusTokenFallback = Compatible: the API token is accepted
+WhatsappWebhookStatusBlocked = Blocked: configure a secret
+WhatsappWebhookHowTo = In Mensaru, paste this URL in the instance webhook settings and add the X-Webhook-Secret header with the secret. If that screen does not allow headers, append ?secret=YOUR_SECRET to the URL. In Evolution API you can use the custom headers block of the webhook.
+WhatsappWebhookGenerateSecret = Generate new secret
+WhatsappWebhookCopy = Copy
+WhatsappWebhookRegenerateWarning = Once generated, the webhook stops receiving until you copy the new secret to the gateway.
+WHATSAPP_WEBHOOK_SECRET = Webhook secret
+WHATSAPP_WEBHOOK_SECRETTooltip = Shared secret with the gateway. The receiver rejects any request without it. If left empty while the webhook is enabled, a new one is generated.
 MissingParameters = Parameters not found
 WhatsappMessageNotSend = Not sent
 #

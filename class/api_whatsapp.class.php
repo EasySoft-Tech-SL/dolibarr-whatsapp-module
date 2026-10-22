@@ -121,7 +121,7 @@ class WhatsappApi extends DolibarrApi
 					$phone = $this->db->escape($phone);
 					$sql = "SELECT s.rowid FROM " . MAIN_DB_PREFIX . "societe s ";
 					$sql .= " LEFT JOIN " . MAIN_DB_PREFIX . "societe_extrafields se ON s.rowid=se.fk_object ";
-					$sql .= " WHERE REGEXP_REPLACE(s.phone, '[^0-9]', '') = '" . $phone . "' OR REGEXP_REPLACE(se.whatsapp_phone_number, '[^0-9]', '') = '" . $phone . "'";
+					$sql .= " WHERE (REGEXP_REPLACE(s.phone, '[^0-9]', '') = '" . $phone . "' OR REGEXP_REPLACE(se.whatsapp_phone_number, '[^0-9]', '') = '" . $phone . "')";
 					$sql .= " AND s.entity IN (" . getEntity('societe', 1) . ") LIMIT 1";
 					$result = $this->db->query($sql);
 

@@ -113,6 +113,9 @@ if ($resql) {
 	}
 }
 $item = $formSetup->newItem('WHATSAPP_WEBHOOK_USER_ID')->setAsSelect($users);
+$formSetup->newItem('WhatsappWebhookSettings')->setAsTitle();
+$item = $formSetup->newItem('WHATSAPP_WEBHOOK_SECRET');
+$item->cssClass = 'minwidth500';
 $item = $formSetup->newItem('WHATSAPP_SHOW_ON_GETNOMURL')->setAsYesNo();
 $item = $formSetup->newItem('MAIN_WHATSAPP_PHONE_PREFIX');
 $item = $formSetup->newItem('WHATSAPP_DEFAULT_COUNTRY_CODE');
@@ -228,6 +231,29 @@ if (versioncompare(explode('.', DOL_VERSION), array(15)) < 0 && $action == 'upda
 }
 
 include DOL_DOCUMENT_ROOT . '/core/actions_setmoduleoptions.inc.php';
+
+// Generar un secreto nuevo para autenticar el webhook.
+// El receptor rechaza cualquier petición que no lo traiga, así que hay que
+// copiarlo a la pasarela (Mensaru, Evolution API…) justo después.
+if ($action == 'genwebhooksecret') {
+	$newsecret = bin2hex(random_bytes(32));
+	$res = dolibarr_set_const($db, 'WHATSAPP_WEBHOOK_SECRET', $newsecret, 'chaine', 0, '', $conf->entity);
+	if ($res > 0) {
+		$conf->global->WHATSAPP_WEBHOOK_SECRET = $newsecret;
+		setEventMessages($langs->trans('WhatsappWebhookSecretGenerated'), null, 'mesgs');
+	} else {
+		setEventMessages($langs->trans('Error'), null, 'errors');
+	}
+}
+
+// Si se activa el webhook sin secreto, se genera uno para no dejarlo abierto.
+if ($action == 'update' && !empty($conf->global->WHATSAPP_WEBHOOK_ALLOW) && empty($conf->global->WHATSAPP_WEBHOOK_SECRET)) {
+	$newsecret = bin2hex(random_bytes(32));
+	if (dolibarr_set_const($db, 'WHATSAPP_WEBHOOK_SECRET', $newsecret, 'chaine', 0, '', $conf->entity) > 0) {
+		$conf->global->WHATSAPP_WEBHOOK_SECRET = $newsecret;
+		setEventMessages($langs->trans('WhatsappWebhookSecretGenerated'), null, 'mesgs');
+	}
+}
 
 if ($action == 'updateMask') {
 	$maskconst = GETPOST('maskconst', 'alpha');
@@ -376,6 +402,85 @@ if ($action == 'edit') {
 } else {
 	print '<br>' . $langs->trans("NothingToSetup");
 }
+
+// ---------------------------------------------------------------------------
+// Webhook: URL y secreto listos para copiar en la pasarela de WhatsApp.
+// Sin esto, el receptor rechaza todas las peticiones (401) desde la v1.11.
+// ---------------------------------------------------------------------------
+$webhookpath = dol_buildpath('/whatsapp/public/webhook/receiver.php', 1);
+$baseurl = (defined('DOL_MAIN_URL_ROOT') && DOL_MAIN_URL_ROOT) ? DOL_MAIN_URL_ROOT : ((!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' ? 'https' : 'http') . '://' . (isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : 'localhost'));
+$webhookurl = rtrim($baseurl, '/') . $webhookpath;
+$webhooksecret = !empty($conf->global->WHATSAPP_WEBHOOK_SECRET) ? $conf->global->WHATSAPP_WEBHOOK_SECRET : '';
+$hasservertoken = !empty($conf->global->WHATSAPP_SERVER_TOKEN);
+
+print '<script type="text/javascript">
+function waCopyField(id) {
+	var el = document.getElementById(id);
+	if (!el) { return; }
+	el.select();
+	el.setSelectionRange(0, 99999);
+	try { document.execCommand("copy"); } catch (e) {}
+}
+</script>';
+
+print load_fiche_titre($langs->trans('WhatsappWebhookSettings'), '', '');
+print '<span class="opacitymedium">' . $langs->trans('WhatsappWebhookIntro') . '</span><br><br>';
+
+print '<table class="noborder centpercent">';
+print '<tr class="liste_titre">';
+print '<td width="30%">' . $langs->trans('Parameter') . '</td>';
+print '<td>' . $langs->trans('Value') . '</td>';
+print '</tr>';
+
+// URL del receptor
+print '<tr class="oddeven">';
+print '<td><strong>' . $langs->trans('WhatsappWebhookUrl') . '</strong></td>';
+print '<td>';
+print '<input type="text" id="wa-webhook-url" class="flat minwidth500" readonly value="' . dol_escape_htmltag($webhookurl) . '">';
+print ' <button type="button" class="butAction" onclick="waCopyField(\'wa-webhook-url\')">' . $langs->trans('WhatsappWebhookCopy') . '</button>';
+print '<br><span class="opacitymedium">' . $langs->trans('WhatsappWebhookUrlHelp') . '</span>';
+print '</td>';
+print '</tr>';
+
+// Secreto compartido
+print '<tr class="oddeven">';
+print '<td><strong>' . $langs->trans('WhatsappWebhookSecret') . '</strong></td>';
+print '<td>';
+if ($webhooksecret !== '') {
+	print '<input type="text" id="wa-webhook-secret" class="flat minwidth500" readonly value="' . dol_escape_htmltag($webhooksecret) . '">';
+	print ' <button type="button" class="butAction" onclick="waCopyField(\'wa-webhook-secret\')">' . $langs->trans('WhatsappWebhookCopy') . '</button>';
+} else {
+	print '<span class="badge badge-status8 badge-status">' . $langs->trans('WhatsappWebhookSecretMissing') . '</span>';
+}
+print '<br><span class="opacitymedium">' . $langs->trans('WhatsappWebhookSecretHelp') . '</span>';
+print '</td>';
+print '</tr>';
+
+// Estado
+print '<tr class="oddeven">';
+print '<td><strong>' . $langs->trans('Status') . '</strong></td>';
+print '<td>';
+if ($webhooksecret !== '') {
+	print '<span class="badge badge-status4 badge-status">' . $langs->trans('WhatsappWebhookStatusProtected') . '</span>';
+} elseif ($hasservertoken) {
+	print '<span class="badge badge-status1 badge-status">' . $langs->trans('WhatsappWebhookStatusTokenFallback') . '</span>';
+} else {
+	print '<span class="badge badge-status8 badge-status">' . $langs->trans('WhatsappWebhookStatusBlocked') . '</span>';
+}
+print '</td>';
+print '</tr>';
+print '</table>';
+
+print '<br>';
+print '<div class="opacitymedium">' . $langs->trans('WhatsappWebhookHowTo') . '</div><br>';
+
+// Botón para generar un secreto nuevo (invalida el anterior en la pasarela)
+print '<form method="POST" action="' . $_SERVER['PHP_SELF'] . '?action=genwebhooksecret">';
+print '<input type="hidden" name="token" value="' . newToken() . '">';
+print '<input type="submit" class="butAction" value="' . $langs->trans('WhatsappWebhookGenerateSecret') . '">';
+print ' <span class="warning">' . $langs->trans('WhatsappWebhookRegenerateWarning') . '</span>';
+print '</form>';
+print '<br>';
 
 //veeirica que los 3 campos de la api estan cumplimentados
 $whatConf = getWhatsappConf();

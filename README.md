@@ -128,6 +128,7 @@ git clone https://github.com/usuario/whatsapp.git whatsapp
 | `WHATSAPP_SERVER_TOKEN` | Token de autenticación API | ✅ |
 | `WHATSAPP_WEBHOOK_ALLOW` | Permitir recepción de webhooks | ❌ |
 | `WHATSAPP_WEBHOOK_USER_ID` | Usuario para procesar webhooks | ❌ |
+| `WHATSAPP_WEBHOOK_SECRET` | Secreto compartido que debe enviar la pasarela (se genera solo al activar el webhook) | ❌ |
 | `WHATSAPP_SHOW_ON_GETNOMURL` | Mostrar botón WhatsApp en fichas | ❌ |
 | `MAIN_WHATSAPP_PHONE_PREFIX` | Prefijo telefónico por defecto | ❌ |
 | `WHATSAPP_QUEUE_MAX_PER_RUN` | Mensajes a enviar por ejecución del cron (N) | ❌ |
@@ -142,14 +143,35 @@ git clone https://github.com/usuario/whatsapp.git whatsapp
 
 ### 🔗 Configuración de Webhooks
 
-Para recibir mensajes entrantes automáticamente:
+Desde la 1.11 la pantalla de configuración del módulo muestra la URL del webhook y el
+secreto compartido, con botones para copiarlos y el estado de protección. Es lo que hay
+que pegar en la pasarela (Mensaru, Evolution API u otra):
 
-1. Activar `WHATSAPP_WEBHOOK_ALLOW = 1`
-2. Configurar la URL del webhook en EasySoft Tech:
+1. Activar `WHATSAPP_WEBHOOK_ALLOW = 1`. El módulo genera `WHATSAPP_WEBHOOK_SECRET`.
+2. Copiar la **URL del webhook** desde la configuración:
    ```
    https://tu-dominio.com/custom/whatsapp/public/webhook/receiver.php
    ```
-3. Seleccionar usuario para procesar mensajes entrantes
+3. Pegar también el **secreto** en la pasarela, en una de estas vías (se aceptan todas):
+   - cabecera `X-Webhook-Secret: <secreto>`
+   - cabecera `Authorization: Bearer <secreto>`
+   - campo `apikey` del cuerpo JSON
+   - parámetro de URL `?secret=<secreto>`
+4. Seleccionar el usuario que procesará los mensajes entrantes.
+
+Sin secreto configurado el receptor responde **503**; si el secreto no coincide, **401**.
+Si no se define `WHATSAPP_WEBHOOK_SECRET`, se acepta `WHATSAPP_SERVER_TOKEN` como secreto
+para no romper instalaciones que ya compartían ese token.
+
+⚠️ En Mensaru, la pantalla de instancia reescribe la configuración del webhook y puede
+perder las cabeceras personalizadas. Si ocurre, usa la vía del parámetro `?secret=` en la
+URL, que sobrevive a esa reescritura.
+
+⚠️ Con Evolution API 2.2.x: el campo `apikey` del cuerpo puede llegar `null` (depende de
+`AUTHENTICATION_EXPOSE_IN_FETCH_INSTANCES`) y su valor es la credencial de la instancia, no
+un secreto de webhook; úsalo solo como compatibilidad. El parámetro `?secret=` deja de
+funcionar si el webhook tiene `byEvents: true`, porque Evolution concatena el nombre del
+evento al final de la URL. La vía recomendada es la cabecera `X-Webhook-Secret`.
 
 ### 👥 Sistema de Permisos
 
