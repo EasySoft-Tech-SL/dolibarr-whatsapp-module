@@ -123,7 +123,7 @@ jobs:
         with:
           name: module_whatsapp-${{ steps.version.outputs.version }}
           path: module_whatsapp-${{ steps.version.outputs.version }}.zip
-          retention-days: 90
+          retention-days: 1
           if-no-files-found: error
       
       - name: Create GitHub Release
