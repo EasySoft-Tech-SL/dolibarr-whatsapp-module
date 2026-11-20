@@ -1,5 +1,12 @@
 # CHANGELOG WHATSAPP FOR [DOLIBARR ERP CRM](https://www.dolibarr.org)
 
+## [Sin publicar]
+
+### 🐛 El secreto de la URL ya no lo anula el `apikey` del cuerpo
+
+- **Entrantes rechazados con 401 aunque el secreto fuera correcto.** El receptor solo comprobaba la primera vía que encontraba (cabecera, Bearer, `apikey` del cuerpo, `secret` de la URL). Evolution API rellena el `apikey` del cuerpo de cada evento con el token de la instancia, así que una instalación que había pegado en la pasarela la URL con su `?secret=`, como indica la pantalla de configuración, recibía 401 en todos los mensajes.
+- **Corrección:** se comprueban todas las vías presentadas y basta con que coincida una, siempre en tiempo constante con `hash_equals()`. Todo lo que se aceptaba antes se sigue aceptando; ahora además vale el `?secret=` de la URL aunque el cuerpo traiga otro `apikey`.
+
 ## [1.11] - 2026-10-22
 
 ### 🔐 Seguridad: autenticación de origen del webhook (CWE-306 / CWE-345)

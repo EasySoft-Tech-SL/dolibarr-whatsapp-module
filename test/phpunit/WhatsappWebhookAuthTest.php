@@ -99,6 +99,53 @@ final class WhatsappWebhookAuthTest extends TestCase
 		$this->assertTrue(WhatsappWebhookAuth::isBodyTooLarge(WhatsappWebhookAuth::MAX_BODY_BYTES + 1));
 	}
 
+	public function testAllPresentedSecretsAreCollectedInOrder()
+	{
+		$server = array('HTTP_X_WEBHOOK_SECRET' => 'h', 'HTTP_AUTHORIZATION' => 'Bearer b');
+		$body = array('apikey' => 'token-instancia');
+		$query = array('secret' => 'q');
+		$this->assertSame(array('h', 'b', 'token-instancia', 'q'), WhatsappWebhookAuth::getProvidedSecrets($body, $server, $query));
+	}
+
+	public function testEmptyAndDuplicatedCandidatesAreDropped()
+	{
+		$body = array('apikey' => '  ');
+		$query = array('secret' => 'same');
+		$server = array('HTTP_X_WEBHOOK_SECRET' => 'same');
+		$this->assertSame(array('same'), WhatsappWebhookAuth::getProvidedSecrets($body, $server, $query));
+		$this->assertSame(array(), WhatsappWebhookAuth::getProvidedSecrets(array(), array(), array()));
+	}
+
+	public function testBodyApikeyNoLongerShadowsTheUrlSecret()
+	{
+		// Evolution manda siempre el token de la instancia en "apikey": con solo el primer candidato,
+		// un ?secret= correcto en la URL quedaba anulado y el receptor respondía 401.
+		$candidates = WhatsappWebhookAuth::getProvidedSecrets(array('apikey' => 'token-instancia'), array(), array('secret' => 'mi-secreto'));
+		$this->assertFalse(WhatsappWebhookAuth::matches(WhatsappWebhookAuth::getProvidedSecret(array('apikey' => 'token-instancia'), array(), array('secret' => 'mi-secreto')), array('mi-secreto')));
+		$this->assertTrue(WhatsappWebhookAuth::matchesAny($candidates, array('mi-secreto')));
+	}
+
+	public function testEverythingAcceptedBeforeIsStillAccepted()
+	{
+		// Token de la instancia configurado como secreto y un ?secret= viejo en la URL: sigue valiendo
+		$candidates = WhatsappWebhookAuth::getProvidedSecrets(array('apikey' => 'token-instancia'), array(), array('secret' => 'viejo'));
+		$this->assertTrue(WhatsappWebhookAuth::matchesAny($candidates, array('token-instancia')));
+	}
+
+	public function testMatchesAnyRejectsWhenNothingMatches()
+	{
+		$this->assertFalse(WhatsappWebhookAuth::matchesAny(array('a', 'b'), array('s3cret')));
+		$this->assertFalse(WhatsappWebhookAuth::matchesAny(array(), array('s3cret')));
+		$this->assertFalse(WhatsappWebhookAuth::matchesAny(array('a'), array('', null)));
+	}
+
+	public function testReceiverChecksEveryPresentedSecret()
+	{
+		$receiver = file_get_contents(dirname(__DIR__, 2) . '/public/webhook/receiver.php');
+		$this->assertStringContainsString('WhatsappWebhookAuth::getProvidedSecrets(', $receiver);
+		$this->assertStringContainsString('WhatsappWebhookAuth::matchesAny(', $receiver);
+	}
+
 	public function testSecretIsMaskedBeforePersisting()
 	{
 		$this->assertSame('', WhatsappWebhookAuth::maskIfSecret('s3cret', array('s3cret')));

@@ -163,8 +163,11 @@ if (empty($allowedSecrets)) {
 	die(json_encode(['error' => 'Webhook sin secreto configurado']));
 }
 
-$providedSecret = WhatsappWebhookAuth::getProvidedSecret($eventData, $_SERVER, $_GET);
-if (!WhatsappWebhookAuth::matches($providedSecret, $allowedSecrets)) {
+// Se aceptan TODAS las vías presentadas, no solo la primera: Evolution pone el token de la instancia
+// en el "apikey" del cuerpo de cada evento y, si solo se miraba ese, un "?secret=" correcto en la
+// URL quedaba anulado (401).
+$providedSecrets = WhatsappWebhookAuth::getProvidedSecrets($eventData, $_SERVER, $_GET);
+if (!WhatsappWebhookAuth::matchesAny($providedSecrets, $allowedSecrets)) {
 	dol_syslog('WhatsApp webhook: rejected, invalid secret from ' . (isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : '?'), LOG_WARNING);
 	http_response_code(401);
 	header('Content-Type: application/json');

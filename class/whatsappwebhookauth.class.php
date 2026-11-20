@@ -104,6 +104,69 @@ class WhatsappWebhookAuth
 	}
 
 	/**
+	 * Every secret the caller presents, in the same order as getProvidedSecret().
+	 *
+	 * getProvidedSecret() only returns the first one, so a non-matching early
+	 * candidate shadows a correct later one: Evolution API puts the instance
+	 * token in the body "apikey" of every event, which hid a correct "?secret="
+	 * in the URL and the receiver answered 401. Checking all of them only adds
+	 * accepted cases; everything accepted before is still accepted.
+	 *
+	 * @param	array	$eventData	Decoded JSON body
+	 * @param	array	$server		$_SERVER
+	 * @param	array	$query		$_GET / query string
+	 * @return	string[]			Non-empty candidates, without duplicates
+	 */
+	public static function getProvidedSecrets($eventData, $server, $query = array())
+	{
+		$candidates = array();
+
+		$candidates[] = self::getHeader($server, self::HEADER_NAME);
+
+		$auth = self::getHeader($server, 'Authorization');
+		if ($auth !== '' && stripos($auth, 'Bearer ') === 0) {
+			$candidates[] = trim(substr($auth, 7));
+		}
+
+		if (is_array($eventData) && isset($eventData['apikey']) && is_string($eventData['apikey'])) {
+			$candidates[] = trim($eventData['apikey']);
+		}
+
+		if (is_array($query) && isset($query['secret']) && is_string($query['secret'])) {
+			$candidates[] = trim($query['secret']);
+		}
+
+		$result = array();
+		foreach ($candidates as $candidate) {
+			if ($candidate !== '' && !in_array($candidate, $result, true)) {
+				$result[] = $candidate;
+			}
+		}
+		return $result;
+	}
+
+	/**
+	 * Whether any of the presented secrets matches any configured one.
+	 *
+	 * Every pair is compared with hash_equals() and the loop never stops early,
+	 * so the time spent does not depend on which candidate matched.
+	 *
+	 * @param	string[]	$providedList	Secrets presented by the caller
+	 * @param	array		$allowed		Configured secrets (empty entries ignored)
+	 * @return	bool
+	 */
+	public static function matchesAny($providedList, $allowed)
+	{
+		$ok = false;
+		foreach ((array) $providedList as $provided) {
+			if (self::matches($provided, $allowed)) {
+				$ok = true;
+			}
+		}
+		return $ok;
+	}
+
+	/**
 	 * Compare the presented secret against the configured ones.
 	 *
 	 * hash_equals() is used for every candidate so the comparison is constant
