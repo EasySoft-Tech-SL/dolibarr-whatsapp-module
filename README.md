@@ -159,6 +159,11 @@ que pegar en la pasarela (Mensaru, Evolution API u otra):
    - parámetro de URL `?secret=<secreto>`
 4. Seleccionar el usuario que procesará los mensajes entrantes.
 
+Basta con que coincida **una** de las vías que trae la petición. Hasta la 1.11 solo se miraba la
+primera que aparecía, y el `apikey` que Evolution API pone en el cuerpo (el token de la instancia)
+dejaba sin efecto el `?secret=` de la URL: la pasarela recibía 401 aunque el secreto fuera correcto.
+Desde la 1.12 eso ya no pasa.
+
 Sin secreto configurado el receptor responde **503**; si el secreto no coincide, **401**.
 Si no se define `WHATSAPP_WEBHOOK_SECRET`, se acepta `WHATSAPP_SERVER_TOKEN` como secreto
 para no romper instalaciones que ya compartían ese token.

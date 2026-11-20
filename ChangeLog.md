@@ -1,6 +1,6 @@
 # CHANGELOG WHATSAPP FOR [DOLIBARR ERP CRM](https://www.dolibarr.org)
 
-## [Sin publicar]
+## [1.12] - 2026-11-20
 
 ### 🐛 El secreto de la URL ya no lo anula el `apikey` del cuerpo
 

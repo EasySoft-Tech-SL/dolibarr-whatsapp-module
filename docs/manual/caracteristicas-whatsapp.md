@@ -37,7 +37,7 @@ WhatsApp for Dolibarr conecta el ERP con WhatsApp a través de un servidor de me
 ## Webhook autenticado (desde 1.11)
 
 - Secreto compartido obligatorio, comparado en tiempo constante.
-- Acepta el secreto por cabecera, Bearer, campo del cuerpo o parámetro de URL.
+- Acepta el secreto por cabecera, Bearer, campo del cuerpo o parámetro de URL. Desde la 1.12 basta con que coincida una de las vías que trae la petición.
 - Rechaza peticiones sin secreto (401) y configuraciones sin secreto (503).
 - Límite de tamaño del cuerpo y sin CORS abierto.
 - La pantalla de configuración muestra la URL y el secreto listos para copiar en Mensaru o Evolution API.

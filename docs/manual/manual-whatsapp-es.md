@@ -56,6 +56,8 @@ En Mensaru, pega la URL en la configuración del webhook de la instancia y añad
 
 En Evolution API, el webhook se configura por instancia con `POST /webhook/set/{instancia}` y admite un objeto `headers`. La cabecera es la vía recomendada. Dos avisos si usas el parámetro en la URL: deja de funcionar con `byEvents: true`, porque Evolution añade el nombre del evento al final de la URL, y el secreto queda en los logs del proxy. El campo `apikey` del cuerpo lo pone Evolution con el token de la instancia y puede llegar vacío, así que úsalo solo como compatibilidad.
 
+Basta con que coincida una de las vías que trae la petición. Con la 1.11, si la pasarela mandaba el `apikey` con el token de la instancia, ese valor era el único que se comprobaba y el parámetro `secret` de la URL no contaba: llegaba un 401 aunque el secreto estuviera bien puesto. Si te pasaba, actualiza a la 1.12.
+
 ### Qué ocurre con cada petición
 
 - Si el secreto coincide, el evento se guarda en el log. Si es un mensaje entrante, se busca el tercero por teléfono y se crea la entrada en su agenda.
